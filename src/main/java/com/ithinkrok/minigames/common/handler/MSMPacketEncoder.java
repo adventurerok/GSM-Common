@@ -5,24 +5,20 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by paul on 28/01/16.
  */
 public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
-    @Override
-    protected void encode(ChannelHandlerContext ctx, Packet msg, ByteBuf out) throws Exception {
-        out.writeByte(msg.getId());
 
-        ConfigurationSection payload = msg.getPayload();
-        writeConfig(payload, out);
-    }
 
-    private void writeConfig(ConfigurationSection config, ByteBuf out) {
+    static void writeConfig(ConfigurationSection config, ByteBuf out) {
         out.writeByte(ConfigType.CONFIG);
 
         Set<String> keys = config.getKeys(false);
@@ -36,26 +32,35 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         }
     }
 
-    private void write(Object obj, ByteBuf out) {
+    static void write(Object obj, ByteBuf out) {
         if (obj instanceof String) writeString((String) obj, out);
         else if (obj instanceof Number) writeNumber((Number) obj, out);
         else if (obj instanceof ConfigurationSection) writeConfig((ConfigurationSection) obj, out);
+        else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out);
         else if (obj instanceof Character) writeChar((Character) obj, out);
         else if (obj instanceof List<?>) writeList((List<?>) obj, out);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
     }
 
-    private void writeList(List<?> list, ByteBuf out) {
+    @SuppressWarnings("unchecked")
+    static void writeMapConfig(Map<?, ?> obj, ByteBuf out) {
+        MemoryConfiguration config = new MemoryConfiguration();
+        config.addDefaults((Map<String, Object>) obj);
+
+        writeConfig(config, out);
+    }
+
+    static void writeList(List<?> list, ByteBuf out) {
         out.writeByte(getListType(list));
 
         PacketUtils.writeVarInt(list.size(), out);
 
-        for(Object obj : list) {
+        for (Object obj : list) {
             write(obj, out);
         }
     }
 
-    private int getListType(List<?> list) {
+    static int getListType(List<?> list) {
         if (list.isEmpty()) return ConfigType.LIST_MASK;
 
         Iterator<?> iterator = list.iterator();
@@ -71,7 +76,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         return ConfigType.LIST_MASK | type;
     }
 
-    private int getObjectType(Object o) {
+    static int getObjectType(Object o) {
         if (o instanceof String) return ConfigType.STRING;
         else if (o instanceof Number) {
             if (o instanceof Integer || o instanceof Short) return ConfigType.VAR_INT;
@@ -80,19 +85,13 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
             else if (o instanceof Byte) return ConfigType.BYTE;
             else if (o instanceof Long) return ConfigType.VAR_LONG;
             else throw new UnsupportedOperationException("Unsupported number type: " + o.getClass());
-        } else if (o instanceof ConfigurationSection) return ConfigType.CONFIG;
+        } else if (o instanceof ConfigurationSection || o instanceof Map<?, ?>) return ConfigType.CONFIG;
         else if (o instanceof Character) return ConfigType.CHAR;
         else if (o instanceof List<?>) return ConfigType.LIST_MASK;
         else throw new UnsupportedOperationException("Unsupported object type: " + o.getClass());
     }
 
-    private void writeChar(Character obj, ByteBuf out) {
-        out.writeByte(ConfigType.CHAR);
-
-        out.writeChar(obj);
-    }
-
-    private void writeNumber(Number obj, ByteBuf out) {
+    static void writeNumber(Number obj, ByteBuf out) {
         if (obj instanceof Integer || obj instanceof Short) {
             out.writeByte(ConfigType.VAR_INT);
 
@@ -116,9 +115,23 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         }
     }
 
-    private void writeString(String str, ByteBuf out) {
+    static void writeString(String str, ByteBuf out) {
         out.writeByte(ConfigType.STRING);
 
         PacketUtils.writeString(str, out);
+    }
+
+    static void writeChar(Character obj, ByteBuf out) {
+        out.writeByte(ConfigType.CHAR);
+
+        out.writeChar(obj);
+    }
+
+    @Override
+    protected void encode(ChannelHandlerContext ctx, Packet msg, ByteBuf out) throws Exception {
+        out.writeByte(msg.getId());
+
+        ConfigurationSection payload = msg.getPayload();
+        writeConfig(payload, out);
     }
 }
