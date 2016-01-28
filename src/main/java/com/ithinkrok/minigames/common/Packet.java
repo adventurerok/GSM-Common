@@ -13,7 +13,7 @@ public class Packet {
     private final byte id;
 
     /**
-     * The compoundmap for the packet
+     * The payload for the packet
      */
     private final ConfigurationSection payload;
 
