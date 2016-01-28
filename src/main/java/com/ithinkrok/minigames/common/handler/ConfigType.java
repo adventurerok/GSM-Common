@@ -13,11 +13,12 @@ public class ConfigType {
     public static final int CONFIG = 1;
     public static final int VAR_INT = 2;
     public static final int VAR_LONG = 4;
-    public static final int FLOAT = 4;
-    public static final int DOUBLE = 5;
-    public static final int CHAR = 6;
-    public static final int STRING = 7;
-    public static final int BYTE = 8;
+    public static final int FLOAT = 5;
+    public static final int DOUBLE = 6;
+    public static final int CHAR = 7;
+    public static final int STRING = 8;
+    public static final int BYTE = 9;
 
     public static final int LIST_MASK = 128;
+
 }

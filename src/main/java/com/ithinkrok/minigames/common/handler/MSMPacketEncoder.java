@@ -18,8 +18,8 @@ import java.util.Set;
 public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
 
-    static void writeConfig(ConfigurationSection config, ByteBuf out) {
-        out.writeByte(ConfigType.CONFIG);
+    static void writeConfig(ConfigurationSection config, ByteBuf out, boolean writeType) {
+        if(writeType) out.writeByte(ConfigType.CONFIG);
 
         Set<String> keys = config.getKeys(false);
 
@@ -28,35 +28,38 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         for (String key : keys) {
 
             PacketUtils.writeString(key, out);
-            write(config.get(key), out);
+            write(config.get(key), out, true);
         }
     }
 
-    static void write(Object obj, ByteBuf out) {
-        if (obj instanceof String) writeString((String) obj, out);
-        else if (obj instanceof Number) writeNumber((Number) obj, out);
-        else if (obj instanceof ConfigurationSection) writeConfig((ConfigurationSection) obj, out);
-        else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out);
-        else if (obj instanceof Character) writeChar((Character) obj, out);
-        else if (obj instanceof List<?>) writeList((List<?>) obj, out);
+    static void write(Object obj, ByteBuf out, boolean writeType) {
+        if (obj instanceof String) writeString((String) obj, out, writeType);
+        else if (obj instanceof Number) writeNumber((Number) obj, out, writeType);
+        else if (obj instanceof ConfigurationSection) writeConfig((ConfigurationSection) obj, out, writeType);
+        else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
+        else if (obj instanceof Character) writeChar((Character) obj, out, writeType);
+        else if (obj instanceof List<?>) writeList((List<?>) obj, out, writeType);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
     }
 
     @SuppressWarnings("unchecked")
-    static void writeMapConfig(Map<?, ?> obj, ByteBuf out) {
+    static void writeMapConfig(Map<?, ?> obj, ByteBuf out, boolean writeType) {
         MemoryConfiguration config = new MemoryConfiguration();
         config.addDefaults((Map<String, Object>) obj);
 
-        writeConfig(config, out);
+        writeConfig(config, out, writeType);
     }
 
-    static void writeList(List<?> list, ByteBuf out) {
-        out.writeByte(getListType(list));
+    static void writeList(List<?> list, ByteBuf out, boolean writeType) {
+        int listType = getListType(list);
+        if(writeType) out.writeByte(listType);
 
         PacketUtils.writeVarInt(list.size(), out);
 
+        boolean writeSubType = listType == ConfigType.LIST_MASK;
+
         for (Object obj : list) {
-            write(obj, out);
+            write(obj, out, writeSubType);
         }
     }
 
@@ -91,38 +94,38 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         else throw new UnsupportedOperationException("Unsupported object type: " + o.getClass());
     }
 
-    static void writeNumber(Number obj, ByteBuf out) {
+    static void writeNumber(Number obj, ByteBuf out, boolean writeType) {
         if (obj instanceof Integer || obj instanceof Short) {
-            out.writeByte(ConfigType.VAR_INT);
+            if(writeType) out.writeByte(ConfigType.VAR_INT);
 
             PacketUtils.writeVarInt(obj.intValue(), out);
         } else if (obj instanceof Float) {
-            out.writeByte(ConfigType.FLOAT);
+            if(writeType) out.writeByte(ConfigType.FLOAT);
 
             out.writeFloat(obj.floatValue());
         } else if (obj instanceof Double) {
-            out.writeByte(ConfigType.DOUBLE);
+            if(writeType) out.writeByte(ConfigType.DOUBLE);
 
             out.writeDouble(obj.doubleValue());
         } else if (obj instanceof Byte) {
-            out.writeByte(ConfigType.BYTE);
+            if(writeType) out.writeByte(ConfigType.BYTE);
 
             out.writeByte(obj.byteValue());
         } else if (obj instanceof Long) {
-            out.writeByte(ConfigType.VAR_LONG);
+            if(writeType) out.writeByte(ConfigType.VAR_LONG);
 
             PacketUtils.writeVarLong(obj.longValue(), out);
         }
     }
 
-    static void writeString(String str, ByteBuf out) {
-        out.writeByte(ConfigType.STRING);
+    static void writeString(String str, ByteBuf out, boolean writeType) {
+        if(writeType) out.writeByte(ConfigType.STRING);
 
         PacketUtils.writeString(str, out);
     }
 
-    static void writeChar(Character obj, ByteBuf out) {
-        out.writeByte(ConfigType.CHAR);
+    static void writeChar(Character obj, ByteBuf out, boolean writeType) {
+        if(writeType) out.writeByte(ConfigType.CHAR);
 
         out.writeChar(obj);
     }
@@ -132,6 +135,6 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         out.writeByte(msg.getId());
 
         ConfigurationSection payload = msg.getPayload();
-        writeConfig(payload, out);
+        writeConfig(payload, out, false);
     }
 }

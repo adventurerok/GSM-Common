@@ -4,6 +4,9 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by paul on 28/01/16.
  */
@@ -51,6 +54,7 @@ public class PacketUtils {
         return readVarInt(input, 5);
     }
 
+    @SuppressWarnings("Duplicates")
     public static int readVarInt(ByteBuf input, int maxBytes) {
         int out = 0;
         int bytes = 0;
@@ -88,5 +92,32 @@ public class PacketUtils {
                 break;
             }
         }
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static long readVarLong(ByteBuf input) {
+        return readVarLong(input, 10);
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static long readVarLong(ByteBuf input, int maxBytes) {
+        long out = 0;
+        long bytes = 0;
+        byte in;
+        while (true) {
+            in = input.readByte();
+
+            out |= (in & 0x7F) << (bytes++ * 7);
+
+            if (bytes > maxBytes) {
+                throw new RuntimeException("VarInt too big");
+            }
+
+            if ((in & 0x80) != 0x80) {
+                break;
+            }
+        }
+
+        return out;
     }
 }
