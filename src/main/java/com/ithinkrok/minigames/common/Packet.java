@@ -29,4 +29,12 @@ public class Packet {
     public ConfigurationSection getPayload() {
         return payload;
     }
+
+    @Override
+    public String toString() {
+        return "Packet{" +
+                "id=" + id +
+                ", payload=" + payload +
+                '}';
+    }
 }
