@@ -27,7 +27,7 @@ public class MSMFrameDecoder extends ByteToMessageDecoder {
             }
 
             buf[i] = in.readByte();
-            if(buf[i] > 0) {
+            if(buf[i] >= 0) {
                 int length = PacketUtils.readVarInt(Unpooled.wrappedBuffer(in));
                 if(length == 0) throw new CorruptedFrameException("Empty packet");
 
