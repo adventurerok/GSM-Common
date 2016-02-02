@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.common.handler;
+package com.ithinkrok.msm.common.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.common.handler;
+package com.ithinkrok.msm.common.handler;
 
 
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;

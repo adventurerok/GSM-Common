@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.common.handler;
+package com.ithinkrok.msm.common.handler;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;

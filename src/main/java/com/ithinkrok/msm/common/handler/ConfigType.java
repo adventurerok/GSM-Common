@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.common.handler;
+package com.ithinkrok.msm.common.handler;
 
 /**
  * Created by paul on 28/01/16.

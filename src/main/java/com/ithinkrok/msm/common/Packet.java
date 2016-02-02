@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.common;
+package com.ithinkrok.msm.common;
 
 import org.bukkit.configuration.ConfigurationSection;
 
