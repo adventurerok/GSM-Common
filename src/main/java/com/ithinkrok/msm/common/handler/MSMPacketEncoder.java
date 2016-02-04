@@ -7,10 +7,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by paul on 28/01/16.
@@ -38,7 +35,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         else if (obj instanceof ConfigurationSection) writeConfig((ConfigurationSection) obj, out, writeType);
         else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
         else if (obj instanceof Character) writeChar((Character) obj, out, writeType);
-        else if (obj instanceof List<?>) writeList((List<?>) obj, out, writeType);
+        else if (obj instanceof Collection<?>) writeList((Collection<?>) obj, out, writeType);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
     }
 
@@ -50,7 +47,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         writeConfig(config, out, writeType);
     }
 
-    static void writeList(List<?> list, ByteBuf out, boolean writeType) {
+    static void writeList(Collection<?> list, ByteBuf out, boolean writeType) {
         int listType = getListType(list);
         if(writeType) out.writeByte(listType);
 
@@ -63,7 +60,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         }
     }
 
-    static int getListType(List<?> list) {
+    static int getListType(Collection<?> list) {
         if (list.isEmpty()) return ConfigType.LIST_MASK;
 
         Iterator<?> iterator = list.iterator();
@@ -90,7 +87,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
             else throw new UnsupportedOperationException("Unsupported number type: " + o.getClass());
         } else if (o instanceof ConfigurationSection || o instanceof Map<?, ?>) return ConfigType.CONFIG;
         else if (o instanceof Character) return ConfigType.CHAR;
-        else if (o instanceof List<?>) return ConfigType.LIST_MASK;
+        else if (o instanceof Collection<?>) return ConfigType.LIST_MASK;
         else throw new UnsupportedOperationException("Unsupported object type: " + o.getClass());
     }
 
