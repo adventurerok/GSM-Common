@@ -19,6 +19,8 @@ public class ConfigType {
     public static final int STRING = 8;
     public static final int BYTE = 9;
 
+    public static final int BYTE_ARRAY = 10;
+
     public static final int LIST_MASK = 128;
 
 }

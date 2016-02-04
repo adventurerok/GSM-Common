@@ -36,7 +36,15 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
         else if (obj instanceof Character) writeChar((Character) obj, out, writeType);
         else if (obj instanceof Collection<?>) writeList((Collection<?>) obj, out, writeType);
+        else if(obj instanceof byte[]) writeByteArray((byte[]) obj, out, writeType);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
+    }
+
+    private static void writeByteArray(byte[] obj, ByteBuf out, boolean writeType) {
+        if(writeType) out.writeByte(ConfigType.BYTE_ARRAY);
+
+        PacketUtils.writeVarInt(obj.length, out);
+        out.writeBytes(obj);
     }
 
     @SuppressWarnings("unchecked")

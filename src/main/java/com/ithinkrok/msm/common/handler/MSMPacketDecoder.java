@@ -55,11 +55,22 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 return msg.readChar();
             case ConfigType.CONFIG:
                 return readConfig(msg);
+            case ConfigType.BYTE_ARRAY:
+                return readByteArray(msg);
             default:
                 if ((type & ConfigType.LIST_MASK) == ConfigType.LIST_MASK) {
                     return readList(msg, type);
                 } else throw new UnsupportedOperationException("Unsupported data type:" + type);
         }
+    }
+
+    private static byte[] readByteArray(ByteBuf msg) {
+        int length = PacketUtils.readVarInt(msg);
+
+        byte[] result = new byte[length];
+        msg.readBytes(result);
+
+        return result;
     }
 
     private static List<?> readList(ByteBuf msg, int type) {
