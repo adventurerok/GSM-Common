@@ -121,7 +121,12 @@ public class DirectoryWatcher {
                         if (!changed.startsWith(pathListenerGroup.path)) continue;
 
                         for (DirectoryListener listener : pathListenerGroup.listeners) {
-                            listener.fileChanged(changed, kind);
+                            try {
+                                listener.fileChanged(changed, kind);
+                            } catch (Exception e) {
+                                System.err.println("Error while calling DirectoryListener:");
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
