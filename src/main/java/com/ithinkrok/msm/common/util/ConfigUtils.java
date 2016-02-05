@@ -42,14 +42,16 @@ public class ConfigUtils {
 
     @SuppressWarnings("unchecked")
     public static List<ConfigurationSection> getConfigList(ConfigurationSection config, String path) {
-        List<Map<?, ?>> list = config.getMapList(path);
+        List<?> list = config.getList(path);
 
         List<ConfigurationSection> result = new ArrayList<>();
         if (list == null) return result;
 
-        for (Map<?, ?> vecMap : list) {
-            ConfigurationSection vec = configFromMap((Map<String, Object>) vecMap);
-            if (vec != null) result.add(vec);
+        for (Object o : list) {
+            if(o instanceof Map) {
+                ConfigurationSection vec = configFromMap((Map<String, Object>) o);
+                if (vec != null) result.add(vec);
+            } else if(o instanceof ConfigurationSection) result.add((ConfigurationSection) o);
         }
 
         return result;
