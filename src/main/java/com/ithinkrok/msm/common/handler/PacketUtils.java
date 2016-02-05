@@ -77,16 +77,16 @@ public class PacketUtils {
     }
 
     public static void writeVarLong(long value, ByteBuf output) {
-        long part;
+        int part;
         while (true) {
-            part = value & 0x7F;
+            part = (int) (value & 0x7F);
 
             value >>>= 7;
             if (value != 0) {
                 part |= 0x80;
             }
 
-            output.writeByte((int) part);
+            output.writeByte(part);
 
             if (value == 0) {
                 break;
@@ -107,13 +107,13 @@ public class PacketUtils {
         while (true) {
             in = input.readByte();
 
-            out |= (in & 0x7F) << (bytes++ * 7);
+            out |= (in & 0x7FL) << (bytes++ * 7L);
 
             if (bytes > maxBytes) {
-                throw new RuntimeException("VarInt too big");
+                throw new RuntimeException("VarLong too big");
             }
 
-            if ((in & 0x80) != 0x80) {
+            if ((in & 0x80) != 0x80L) {
                 break;
             }
         }
