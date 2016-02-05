@@ -8,5 +8,5 @@ import java.nio.file.WatchEvent;
  */
 public interface DirectoryListener {
 
-    void fileChanged(Path directory, Path file, WatchEvent.Kind<?> event);
+    void fileChanged(Path changed, WatchEvent.Kind<?> event);
 }

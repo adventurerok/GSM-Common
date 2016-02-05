@@ -28,6 +28,7 @@ public class DirectoryWatcher {
         this.watcher = watcher;
 
         thread = new WatcherThread();
+        thread.setDaemon(true);
         thread.start();
     }
 
@@ -113,12 +114,14 @@ public class DirectoryWatcher {
                     WatchEvent<Path> watchEvent = (WatchEvent<Path>) event;
                     Path file = watchEvent.context();
 
+                    Path changed = dir.resolve(file);
+
                     for (PathListenerGroup pathListenerGroup : targets) {
                         //Made sure the listeners in this group are listening for this directory
-                        if (!dir.resolve(file).startsWith(pathListenerGroup.path)) continue;
+                        if (!changed.startsWith(pathListenerGroup.path)) continue;
 
                         for (DirectoryListener listener : pathListenerGroup.listeners) {
-                            listener.fileChanged(dir, file, kind);
+                            listener.fileChanged(changed, kind);
                         }
                     }
                 }
