@@ -1,6 +1,5 @@
 package com.ithinkrok.msm.common;
 
-import com.ithinkrok.msm.common.MinecraftServerType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
@@ -17,7 +16,7 @@ public class MinecraftServerInfo {
     /**
      * The type of the minecraft server
      */
-    private final MinecraftServerType type;
+    private MinecraftServerType type;
 
     /**
      * The name of this minecraft server.
@@ -28,17 +27,17 @@ public class MinecraftServerInfo {
     /**
      * If this minecraft server is in a bungeecord network
      */
-    private final boolean hasBungee;
+    private boolean hasBungee;
 
     /**
      * The maximum player count for this server. -1 indicates no maximum
      */
-    private final int maxPlayerCount;
+    private int maxPlayerCount;
 
     /**
      * The list of plugins that the server has
      */
-    private final List<String> plugins;
+    private List<String> plugins;
 
     public MinecraftServerInfo(MinecraftServerType type, String name, boolean hasBungee, int maxPlayerCount,
                                List<String> plugins) {
@@ -50,12 +49,9 @@ public class MinecraftServerInfo {
     }
 
     public MinecraftServerInfo(ConfigurationSection config) {
-
         name = config.getString("name");
-        type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
-        hasBungee = config.getBoolean("has_bungee");
-        maxPlayerCount = config.getInt("max_players");
-        plugins = config.getStringList("plugins");
+
+        fromConfig(config);
     }
 
     public MinecraftServerType getType() {
@@ -88,6 +84,13 @@ public class MinecraftServerInfo {
         config.set("plugins", new ArrayList<>(plugins));
 
         return config;
+    }
+
+    public void fromConfig(ConfigurationSection config) {
+        type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
+        hasBungee = config.getBoolean("has_bungee");
+        maxPlayerCount = config.getInt("max_players");
+        plugins = config.getStringList("plugins");
     }
 
     @Override
