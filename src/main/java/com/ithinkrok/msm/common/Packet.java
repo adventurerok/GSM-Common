@@ -8,21 +8,21 @@ import org.bukkit.configuration.ConfigurationSection;
 public class Packet {
 
     /**
-     * The id of a packet. IDs 0-127 are reserved. Each MSM plugin has 1 dynamically allocated packet id.
+     * The id of a protocol;
      */
-    private final byte id;
+    private final int id;
 
     /**
      * The payload for the packet
      */
     private final ConfigurationSection payload;
 
-    public Packet(byte id, ConfigurationSection payload) {
+    public Packet(int id, ConfigurationSection payload) {
         this.id = id;
         this.payload = payload;
     }
 
-    public byte getId() {
+    public int getId() {
         return id;
     }
 

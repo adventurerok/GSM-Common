@@ -146,7 +146,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Packet msg, ByteBuf out) throws Exception {
-        out.writeByte(msg.getId());
+        PacketUtils.writeVarInt(msg.getId(), out);
 
         ConfigurationSection payload = msg.getPayload();
         writeConfig(payload, out, false);

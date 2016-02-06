@@ -91,7 +91,7 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        byte id = msg.readByte();
+        int id = PacketUtils.readVarInt(msg);
 
         ConfigurationSection payload = readConfig(msg);
 
