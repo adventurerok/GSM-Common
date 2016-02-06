@@ -4,6 +4,7 @@ import com.ithinkrok.msm.common.Packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
@@ -56,7 +57,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
     @SuppressWarnings("unchecked")
     static void writeMapConfig(Map<?, ?> obj, ByteBuf out, boolean writeType) {
-        MemoryConfiguration config = new MemoryConfiguration();
+        Configuration config = new MemoryConfiguration();
         config.addDefaults((Map<String, Object>) obj);
 
         writeConfig(config, out, writeType);
