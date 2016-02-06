@@ -14,16 +14,14 @@ import java.util.List;
 public class MinecraftServerInfo {
 
     /**
-     * The type of the minecraft server
-     */
-    private MinecraftServerType type;
-
-    /**
      * The name of this minecraft server.
      * Must be equal to the name in the bungeecord config for bungeecord network servers
      */
     private final String name;
-
+    /**
+     * The type of the minecraft server
+     */
+    private MinecraftServerType type;
     /**
      * If this minecraft server is in a bungeecord network
      */
@@ -54,6 +52,13 @@ public class MinecraftServerInfo {
         fromConfig(config);
     }
 
+    public void fromConfig(ConfigurationSection config) {
+        type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
+        hasBungee = config.getBoolean("has_bungee");
+        maxPlayerCount = config.getInt("max_players");
+        plugins = config.getStringList("plugins");
+    }
+
     public MinecraftServerType getType() {
         return type;
     }
@@ -75,7 +80,7 @@ public class MinecraftServerInfo {
     }
 
     public ConfigurationSection toConfig() {
-        MemoryConfiguration config = new MemoryConfiguration();
+        ConfigurationSection config = new MemoryConfiguration();
 
         config.set("name", name);
         config.set("type", type.toString().toLowerCase());
@@ -84,13 +89,6 @@ public class MinecraftServerInfo {
         config.set("plugins", new ArrayList<>(plugins));
 
         return config;
-    }
-
-    public void fromConfig(ConfigurationSection config) {
-        type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
-        hasBungee = config.getBoolean("has_bungee");
-        maxPlayerCount = config.getInt("max_players");
-        plugins = config.getStringList("plugins");
     }
 
     @Override

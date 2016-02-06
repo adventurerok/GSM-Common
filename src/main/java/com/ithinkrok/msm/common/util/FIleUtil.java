@@ -6,6 +6,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.zip.ZipError;
 
 /**
  * Created by paul on 04/02/16.
@@ -17,6 +18,10 @@ public class FIleUtil {
         //Absolute URI
         final URI uri = URI.create("jar:file:" + zipFile.toUri().getRawPath());
 
-        return FileSystems.newFileSystem(uri, new HashMap<>());
+        try {
+            return FileSystems.newFileSystem(uri, new HashMap<>());
+        } catch (ZipError error) {
+            throw new IOException("Failed to create Zip FileSystem", error);
+        }
     }
 }
