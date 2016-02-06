@@ -89,4 +89,40 @@ public class MinecraftServerInfo {
 
         return config;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + (hasBungee ? 1 : 0);
+        result = 31 * result + maxPlayerCount;
+        result = 31 * result + plugins.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MinecraftServerInfo that = (MinecraftServerInfo) o;
+
+        if (hasBungee != that.hasBungee) return false;
+        if (maxPlayerCount != that.maxPlayerCount) return false;
+        if (type != that.type) return false;
+        if (!name.equals(that.name)) return false;
+        return plugins.equals(that.plugins);
+
+    }
+
+    @Override
+    public String toString() {
+        return "MinecraftServerInfo{" +
+                "type=" + type +
+                ", name='" + name + '\'' +
+                ", hasBungee=" + hasBungee +
+                ", maxPlayerCount=" + maxPlayerCount +
+                ", plugins=" + plugins +
+                '}';
+    }
 }
