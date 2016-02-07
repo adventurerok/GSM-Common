@@ -14,8 +14,8 @@ public class CustomCommand {
     private final Map<String, Object> params;
     private final List<Object> defaultArgs;
 
-    public CustomCommand(String command, Map<String, Object> params, List<Object> defaultArgs) {
-        this.command = command;
+    public CustomCommand(String commandName, Map<String, Object> params, List<Object> defaultArgs) {
+        this.command = commandName;
         this.params = params;
         this.defaultArgs = defaultArgs;
     }
