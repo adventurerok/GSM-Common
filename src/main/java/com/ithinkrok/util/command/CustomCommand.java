@@ -69,6 +69,22 @@ public class CustomCommand {
         }
     }
 
+    public String getRemainingArgsAsString(int index) {
+        StringBuilder result = new StringBuilder();
+
+        boolean addSpace = false;
+
+        for(int count = index; count < defaultArgs.size(); ++count) {
+
+            if(!addSpace) addSpace = true;
+            else result.append(' ');
+
+            result.append(String.valueOf(defaultArgs.get(count)));
+        }
+
+        return result.toString();
+    }
+
     public boolean hasIntArg(int index) {
         if (!hasDoubleArg(index)) return false;
 
