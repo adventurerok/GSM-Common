@@ -59,6 +59,8 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
                 return readByteArray(msg);
             case ConfigType.BOOLEAN:
                 return msg.readBoolean();
+            case ConfigType.NULL:
+                return null;
             default:
                 if ((type & ConfigType.LIST_MASK) == ConfigType.LIST_MASK) {
                     return readList(msg, type);

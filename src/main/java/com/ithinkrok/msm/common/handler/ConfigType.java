@@ -21,6 +21,7 @@ public class ConfigType {
 
     public static final int BYTE_ARRAY = 10;
     public static final int BOOLEAN = 11;
+    public static final int NULL = 12;
 
     public static final int LIST_MASK = 128;
 

@@ -39,7 +39,12 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         else if (obj instanceof Collection<?>) writeList((Collection<?>) obj, out, writeType);
         else if(obj instanceof byte[]) writeByteArray((byte[]) obj, out, writeType);
         else if(obj instanceof Boolean) writeBoolean((Boolean)obj, out, writeType);
+        else if(obj == null) writeNull(out, writeType);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
+    }
+
+    private static void writeNull(ByteBuf out, boolean writeType) {
+        if(writeType) out.writeByte(ConfigType.NULL);
     }
 
     private static void writeBoolean(Boolean obj, ByteBuf out, boolean writeType) {
@@ -106,6 +111,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         else if (o instanceof Collection<?>) return ConfigType.LIST_MASK;
         else if (o instanceof byte[]) return ConfigType.BYTE_ARRAY;
         else if (o instanceof Boolean) return ConfigType.BOOLEAN;
+        else if(o == null) return ConfigType.NULL;
         else throw new UnsupportedOperationException("Unsupported object type: " + o.getClass());
     }
 
