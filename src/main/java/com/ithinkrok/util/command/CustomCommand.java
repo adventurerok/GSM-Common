@@ -20,6 +20,17 @@ public class CustomCommand {
         this.defaultArgs = defaultArgs;
     }
 
+    public CustomCommand(String fullCommand) {
+        List<String> args = CommandUtils.splitStringIntoArguments(fullCommand);
+
+        command = args.remove(0).toLowerCase();
+
+        params = CommandUtils.parseArgumentListToMap(args);
+
+        //noinspection unchecked
+        defaultArgs = (List<Object>) params.get("default");
+    }
+
     public Map<String, Object> getParameters() {
         return params;
     }
