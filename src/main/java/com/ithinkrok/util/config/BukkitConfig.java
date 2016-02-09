@@ -12,6 +12,10 @@ public class BukkitConfig implements Config {
 
     private final ConfigurationSection bukkitConfig;
 
+    public BukkitConfig() {
+        this(new MemoryConfiguration());
+    }
+
     public BukkitConfig(ConfigurationSection baseConfig) {
         this.bukkitConfig = baseConfig;
     }
@@ -20,7 +24,10 @@ public class BukkitConfig implements Config {
         this.bukkitConfig = toBukkitConfig(copyFrom);
     }
 
+
     private static ConfigurationSection toBukkitConfig(Config copyFrom) {
+        if(copyFrom instanceof BukkitConfig) return ((BukkitConfig) copyFrom).getBukkitConfig();
+
         ConfigurationSection copyTo = new MemoryConfiguration();
 
         Map<String, Object> values = copyFrom.getValues(true);
@@ -98,7 +105,30 @@ public class BukkitConfig implements Config {
     }
 
     @Override
+    public Config getConfigOrEmpty(String path) {
+        Config config = getConfigOrNull(path);
+
+        return config != null ? config : new MemoryConfig();
+    }
+
+    @Override
     public void set(String path, Object value) {
+        if(value instanceof Config) {
+            value = toBukkitConfig((Config) value);
+        } else if(value instanceof Collection<?>) {
+            List<Object> list = new ArrayList<>();
+
+            for(Object obj : (Iterable<?>) value) {
+                if(obj instanceof Config) {
+                    list.add(toBukkitConfig((Config) obj));
+                } else {
+                    list.add(obj);
+                }
+            }
+
+            value = list;
+        }
+
         bukkitConfig.set(path, value);
     }
 }

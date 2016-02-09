@@ -1,9 +1,18 @@
 package com.ithinkrok.util.config;
 
+import org.apache.commons.lang.ArrayUtils;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
  * Created by paul on 08/02/16.
+ *
+ * Represents a config.
+ *
+ * Configs should only store primitives, arrays/lists, strings and other configs.
  */
 public interface Config {
 
@@ -170,12 +179,14 @@ public interface Config {
         return list != null && !list.isEmpty();
     }
 
-    default Config getConfig(String path) {
+    default Config getConfigOrNull(String path) {
         Object obj = get(path);
 
         if (!(obj instanceof Config)) return null;
         else return (Config) obj;
     }
+
+    Config getConfigOrEmpty(String path);
 
     default boolean isConfig(String path) {
         return get(path) instanceof Config;
@@ -191,5 +202,34 @@ public interface Config {
 
         if (!type.isInstance(obj)) return def;
         return (T) obj;
+    }
+
+    /**
+     * Modifies the fields of the object passed in to the values specified in this config.
+     *
+     * @param object The object to modify the fields of.
+     * @param <T> The type of the object
+     * @return The (now modified) object
+     */
+    default <T> T setObjectFields(T object) {
+        Field[] fields = object.getClass().getDeclaredFields();
+
+        for(Field field : fields) {
+            field.setAccessible(true);
+
+            if(Modifier.isTransient(field.getModifiers())) continue;
+
+            Object newField = getType(field.getName(), field.getType());
+            if(newField == null) continue;
+
+            try {
+                field.set(object, newField);
+            } catch (IllegalAccessException e) {
+                //This should not happen hopefully.
+                e.printStackTrace();
+            }
+        }
+
+        return object;
     }
 }

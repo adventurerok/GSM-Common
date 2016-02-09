@@ -127,6 +127,13 @@ public class MemoryConfig implements Config {
         }
     }
 
+    @Override
+    public Config getConfigOrEmpty(String path) {
+        Config config = getConfigOrNull(path);
+
+        return config != null ? config : new MemoryConfig();
+    }
+
     private Config getOrCreateConfig(String name) {
         Object obj = values.get(name);
 
