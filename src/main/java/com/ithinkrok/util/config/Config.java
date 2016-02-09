@@ -1,9 +1,6 @@
 package com.ithinkrok.util.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by paul on 08/02/16.
@@ -92,7 +89,9 @@ public interface Config {
         return getDouble(path, 0.0d);
     }
 
-    boolean isDouble(String path);
+    default boolean isDouble(String path){
+        return get(path) instanceof Boolean;
+    }
 
     default long getLong(String path, long def){
         Object obj = get(path);
@@ -101,29 +100,62 @@ public interface Config {
         else return def;
     }
 
-    //TODO finish
-
     default long getLong(String path) {
         return getLong(path, 0L);
     }
 
-    boolean isLong(String path);
+    default boolean isLong(String path){
+        return get(path) instanceof Long;
+    }
 
-    byte[] getByteArray(String path, byte[] def);
+    default byte[] getByteArray(String path, byte[] def){
+        Object obj = get(path);
+
+        if(obj instanceof byte[]) return (byte[]) obj;
+        else return def;
+    }
 
     default byte[] getByteArray(String path) {
         return getByteArray(path, new byte[0]);
     }
 
-    boolean isByteArray(String path);
-
-    <T> List<T> getList(String path, List<T> def);
-
-    default <T> List<T> getList(String path) {
-        return getList(path, new ArrayList<>());
+    default boolean isByteArray(String path){
+        return get(path) instanceof byte[];
     }
 
-    boolean isList(String path);
+    @SuppressWarnings("unchecked")
+    default <T> List<T> getList(String path, List<T> def, Class<T> clazz){
+        Object obj = get(path);
+
+        if(!(obj instanceof Collection<?>)) return def;
+
+        Collection<?> input = (Collection<?>) obj;
+        List<T> result = new ArrayList<>();
+
+        for(Object o : input) {
+            if(!clazz.isInstance(o)) continue;
+
+            result.add((T) o);
+        }
+
+        return result;
+    }
+
+    default <T> List<T> getList(String path, Class<T> clazz) {
+        return getList(path, new ArrayList<>(), clazz);
+    }
+
+    default List<String> getStringList(String path) {
+        return getList(path, String.class);
+    }
+
+    default List<Config> getConfigList(String path) {
+        return getList(path, Config.class);
+    }
+
+    default boolean isList(String path){
+        return get(path) instanceof List<?>;
+    }
 
     /**
      *
@@ -131,9 +163,22 @@ public interface Config {
      * @param type The type that the list should contain
      * @return If there is a list at this path and it contains an object with the type {@code type}
      */
-    boolean isList(String path, Class<?> type);
+    default boolean isList(String path, Class<?> type){
+        if(!isList(path)) return false;
 
-    Config getConfig(String path);
+        List<?> list = getList(path, null, type);
 
-    boolean isConfig(String path);
+        return list != null && !list.isEmpty();
+    }
+
+    default Config getConfig(String path){
+        Object obj = get(path);
+
+        if(!(obj instanceof Config)) return null;
+        else return (Config) obj;
+    }
+
+    default boolean isConfig(String path){
+        return get(path) instanceof Config;
+    }
 }
