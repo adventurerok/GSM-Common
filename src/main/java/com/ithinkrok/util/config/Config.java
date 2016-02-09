@@ -217,6 +217,7 @@ public interface Config {
         for(Field field : fields) {
             field.setAccessible(true);
 
+            if(Modifier.isStatic(field.getModifiers())) continue;
             if(Modifier.isTransient(field.getModifiers())) continue;
 
             Object newField = getType(field.getName(), field.getType());
