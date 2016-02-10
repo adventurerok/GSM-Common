@@ -52,6 +52,11 @@ public class WrapperConfig implements Config {
     }
 
     @Override
+    public char getSeparator() {
+        return wrappedConfig.getSeparator();
+    }
+
+    @Override
     public Config getConfigOrEmpty(String path) {
         return wrappedConfig.getConfigOrEmpty(path);
     }
