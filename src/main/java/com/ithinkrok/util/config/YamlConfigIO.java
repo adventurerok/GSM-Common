@@ -28,22 +28,26 @@ public class YamlConfigIO {
         return yaml;
     }
 
-    public static Config loadConfig(Path path) throws IOException {
-        return loadConfig(Files.newBufferedReader(path));
+    public static Config loadToConfig(Path path, Config config) throws IOException {
+        return loadToConfig(Files.newBufferedReader(path), config);
     }
 
-    public static Config loadConfig(InputStream input) {
+    public static Config loadToConfig(InputStream input, Config config) {
         @SuppressWarnings("unchecked")
         Map<String, Object> values = (Map<String, Object>) getYaml().load(input);
 
-        return new MemoryConfig(values);
+        config.setAll(values);
+
+        return config;
     }
 
-    public static Config loadConfig(Reader input) {
+    public static Config loadToConfig(Reader input, Config config) {
         @SuppressWarnings("unchecked")
         Map<String, Object> values = (Map<String, Object>) getYaml().load(input);
 
-        return new MemoryConfig(values);
+        config.setAll(values);
+
+        return config;
     }
 
 }

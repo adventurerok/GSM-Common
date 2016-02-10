@@ -31,7 +31,8 @@ public class MemoryConfig implements Config {
         this.values = new LinkedHashMap<>();
 
         for (Map.Entry<String, Object> entry : values.entrySet()) {
-            set(entry.getKey(), correctMapsToConfigs(entry.getValue()));
+            //Correct maps to configs is now done in the set() method
+            set(entry.getKey(), entry.getValue());
         }
     }
 
@@ -110,7 +111,7 @@ public class MemoryConfig implements Config {
 
             subConfig.set(path.substring(splitterIndex + 1), value);
         } else {
-            values.put(path, value);
+            values.put(path, correctMapsToConfigs(value));
         }
     }
 
