@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common;
 
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
@@ -46,13 +48,13 @@ public class MinecraftServerInfo {
         this.plugins = plugins;
     }
 
-    public MinecraftServerInfo(ConfigurationSection config) {
+    public MinecraftServerInfo(Config config) {
         name = config.getString("name");
 
         fromConfig(config);
     }
 
-    public void fromConfig(ConfigurationSection config) {
+    public void fromConfig(Config config) {
         type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
         hasBungee = config.getBoolean("has_bungee");
         maxPlayerCount = config.getInt("max_players");
@@ -79,8 +81,8 @@ public class MinecraftServerInfo {
         return plugins;
     }
 
-    public ConfigurationSection toConfig() {
-        ConfigurationSection config = new MemoryConfiguration();
+    public Config toConfig() {
+        Config config = new MemoryConfig();
 
         config.set("name", name);
         config.set("type", type.toString().toLowerCase());

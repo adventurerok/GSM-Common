@@ -1,6 +1,8 @@
 package com.ithinkrok.msm.common.handler;
 
 import com.ithinkrok.msm.common.Packet;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -16,7 +18,7 @@ import java.util.*;
 public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
 
-    static void writeConfig(ConfigurationSection config, ByteBuf out, boolean writeType) {
+    static void writeConfig(Config config, ByteBuf out, boolean writeType) {
         if(writeType) out.writeByte(ConfigType.CONFIG);
 
         Set<String> keys = config.getKeys(false);
@@ -33,7 +35,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
     static void write(Object obj, ByteBuf out, boolean writeType) {
         if (obj instanceof String) writeString((String) obj, out, writeType);
         else if (obj instanceof Number) writeNumber((Number) obj, out, writeType);
-        else if (obj instanceof ConfigurationSection) writeConfig((ConfigurationSection) obj, out, writeType);
+        else if (obj instanceof Config) writeConfig((Config) obj, out, writeType);
         else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
         else if (obj instanceof Character) writeChar((Character) obj, out, writeType);
         else if (obj instanceof Collection<?>) writeList((Collection<?>) obj, out, writeType);
@@ -62,8 +64,8 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
     @SuppressWarnings("unchecked")
     static void writeMapConfig(Map<?, ?> obj, ByteBuf out, boolean writeType) {
-        Configuration config = new MemoryConfiguration();
-        config.addDefaults((Map<String, Object>) obj);
+        Config config = new MemoryConfig();
+        config.setAll((Map<String, Object>) obj);
 
         writeConfig(config, out, writeType);
     }
@@ -106,7 +108,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
             else if (o instanceof Byte) return ConfigType.BYTE;
             else if (o instanceof Long) return ConfigType.VAR_LONG;
             else throw new UnsupportedOperationException("Unsupported number type: " + o.getClass());
-        } else if (o instanceof ConfigurationSection || o instanceof Map<?, ?>) return ConfigType.CONFIG;
+        } else if (o instanceof Config || o instanceof Map<?, ?>) return ConfigType.CONFIG;
         else if (o instanceof Character) return ConfigType.CHAR;
         else if (o instanceof Collection<?>) return ConfigType.LIST_MASK;
         else if (o instanceof byte[]) return ConfigType.BYTE_ARRAY;
@@ -155,7 +157,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
     protected void encode(ChannelHandlerContext ctx, Packet msg, ByteBuf out) throws Exception {
         PacketUtils.writeVarInt(msg.getId(), out);
 
-        ConfigurationSection payload = msg.getPayload();
+        Config payload = msg.getPayload();
         writeConfig(payload, out, false);
     }
 }

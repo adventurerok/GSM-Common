@@ -1,6 +1,7 @@
 package com.ithinkrok.msm.common.util;
 
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class ConfigUtils {
 
-    public static final MemoryConfiguration EMPTY_CONFIG = new MemoryConfiguration();
+    public static final Config EMPTY_CONFIG = new MemoryConfig();
 
     public static Vector getVector(Config config, String path) {
         return config.getConfigOrEmpty(path).saveObjectFields(new Vector());

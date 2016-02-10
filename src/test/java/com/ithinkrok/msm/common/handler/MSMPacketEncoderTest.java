@@ -1,6 +1,7 @@
 package com.ithinkrok.msm.common.handler;
 
 
+import com.ithinkrok.util.config.MemoryConfig;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.junit.Test;
@@ -31,6 +32,6 @@ public class MSMPacketEncoderTest {
 
         assertThat(MSMPacketEncoder.getObjectType('c')).isEqualTo(ConfigType.CHAR);
 
-        assertThat(MSMPacketEncoder.getObjectType(new MemoryConfiguration())).isEqualTo(ConfigType.CONFIG);
+        assertThat(MSMPacketEncoder.getObjectType(new MemoryConfig())).isEqualTo(ConfigType.CONFIG);
     }
 }

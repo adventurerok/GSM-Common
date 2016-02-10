@@ -1,6 +1,6 @@
 package com.ithinkrok.msm.common;
 
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 /**
  * Created by paul on 28/01/16.
@@ -15,9 +15,9 @@ public class Packet {
     /**
      * The payload for the packet
      */
-    private final ConfigurationSection payload;
+    private final Config payload;
 
-    public Packet(int id, ConfigurationSection payload) {
+    public Packet(int id, Config payload) {
         this.id = id;
         this.payload = payload;
     }
@@ -26,7 +26,7 @@ public class Packet {
         return id;
     }
 
-    public ConfigurationSection getPayload() {
+    public Config getPayload() {
         return payload;
     }
 

@@ -1,6 +1,8 @@
 package com.ithinkrok.msm.common.handler;
 
 import com.ithinkrok.msm.common.Packet;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -16,10 +18,10 @@ import java.util.List;
 public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
 
-    static ConfigurationSection readConfig(ByteBuf msg) {
+    static Config readConfig(ByteBuf msg) {
         int size = PacketUtils.readVarInt(msg);
 
-        MemoryConfiguration config = new MemoryConfiguration();
+        Config config = new MemoryConfig();
 
         for (int count = 0; count < size; ++count) {
             String key = PacketUtils.readString(msg);
@@ -95,7 +97,7 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         int id = PacketUtils.readVarInt(msg);
 
-        ConfigurationSection payload = readConfig(msg);
+        Config payload = readConfig(msg);
 
         out.add(new Packet(id, payload));
     }
