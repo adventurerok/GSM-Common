@@ -12,11 +12,34 @@ public class MemoryConfig implements Config {
     private final Map<String, Object> values;
 
     public MemoryConfig() {
-        this(new HashMap<>());
+        this(new LinkedHashMap<>());
     }
 
+    @SuppressWarnings("unchecked")
     public MemoryConfig(Map<String, Object> values) {
-        this.values = values;
+        this.values = new LinkedHashMap<>();
+
+        for(Map.Entry<String, Object> entry : values.entrySet()) {
+            set(entry.getKey(), correctMapsToConfigs(entry.getValue()));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object correctMapsToConfigs(Object obj) {
+        //Replace maps with configs
+        if(obj instanceof Map<?, ?>) {
+            return new MemoryConfig((Map<String, Object>) obj);
+        } else if(obj instanceof Collection<?>) {
+            List<Object> correctedList = new ArrayList<>();
+
+            for(Object listItem : (Iterable<Object>) obj){
+                correctedList.add(correctMapsToConfigs(listItem));
+            }
+
+            return correctedList;
+        }
+
+        return obj;
     }
 
     @Override
@@ -45,9 +68,9 @@ public class MemoryConfig implements Config {
 
     @Override
     public Map<String, Object> getValues(boolean deep) {
-        if(!deep) return new HashMap<>(values);
+        if(!deep) return new LinkedHashMap<>(values);
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
 
         for(Map.Entry<String, Object> entry : values.entrySet()) {
             String path = entry.getKey();
