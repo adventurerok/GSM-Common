@@ -1,5 +1,7 @@
 package com.ithinkrok.util.config;
 
+import com.google.common.base.Verify;
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
@@ -81,6 +83,10 @@ public class BukkitConfig implements Config {
     @SuppressWarnings("unchecked")
     @Override
     public Object get(String path, Object def) {
+        Validate.notNull(path, "path cannot be null");
+
+        if(path.isEmpty()) return this;
+
         Object obj = bukkitConfig.get(path, def);
 
         if(obj instanceof ConfigurationSection) {

@@ -1,5 +1,6 @@
 package com.ithinkrok.msm.common.util;
 
+import com.ithinkrok.util.config.Config;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,82 +18,23 @@ public class ConfigUtils {
 
     public static final MemoryConfiguration EMPTY_CONFIG = new MemoryConfiguration();
 
-    public static Vector getVector(ConfigurationSection config, String path) {
-        if (!path.isEmpty()) path = path + ".";
-
-        return new Vector(config.getDouble(path + "x"), config.getDouble(path + "y"), config.getDouble(path + "z"));
+    public static Vector getVector(Config config, String path) {
+        return config.getConfigOrEmpty(path).saveObjectFields(new Vector());
     }
 
-    public static Location getLocation(ConfigurationSection config, World world, String path) {
-        if (!path.isEmpty()) path = path + ".";
-
-        return new Location(world, config.getDouble(path + "x"), config.getDouble(path + "y"),
-                config.getDouble(path + "z"), (float) config.getDouble(path + "yaw"),
-                (float) config.getDouble(path + "pitch"));
+    public static Location getLocation(Config config, World world, String path) {
+        return config.getConfigOrEmpty(path).saveObjectFields(new Location(world, 0, 0, 0));
     }
 
-
-    public static ConfigurationSection getConfigOrEmpty(ConfigurationSection base, String path) {
-        if (path == null || path.isEmpty()) return base;
-
-        ConfigurationSection config = base.getConfigurationSection(path);
-
-        return config != null ? config : EMPTY_CONFIG;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<ConfigurationSection> getConfigList(ConfigurationSection config, String path) {
-        List<?> list = config.getList(path);
-
-        List<ConfigurationSection> result = new ArrayList<>();
-        if (list == null) return result;
-
-        for (Object o : list) {
-            if(o instanceof Map) {
-                ConfigurationSection vec = configFromMap((Map<String, Object>) o);
-                if (vec != null) result.add(vec);
-            } else if(o instanceof ConfigurationSection) result.add((ConfigurationSection) o);
-        }
-
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static ConfigurationSection configFromMap(Map<String, Object> values) {
-        values.replaceAll((s, o) -> {
-            if (!(o instanceof Map<?, ?>)) return o;
-            return configFromMap((Map<String, Object>) o);
-        });
-
-        MemoryConfiguration memory = new MemoryConfiguration();
-        memory.addDefaults(values);
-
-        return memory.getDefaults();
-    }
-
-
-    public static List<Vector> getVectorList(ConfigurationSection config, String path) {
-        List<Map<?, ?>> list = config.getMapList(path);
+    public static List<Vector> getVectorList(Config config, String path) {
+        List<Config> configList = config.getConfigList(path);
 
         List<Vector> result = new ArrayList<>();
-        if (list == null) return result;
 
-        for (Map<?, ?> vecMap : list) {
-            Vector vec = vectorFromMap(vecMap);
-            if (vec != null) result.add(vec);
+        for(Config vectorConfig : configList) {
+            result.add(vectorConfig.saveObjectFields(new Vector()));
         }
 
         return result;
-    }
-
-    private static Vector vectorFromMap(Map<?, ?> vecMap) {
-        try {
-            double x = ((Number) vecMap.get("x")).doubleValue();
-            double y = ((Number) vecMap.get("y")).doubleValue();
-            double z = ((Number) vecMap.get("z")).doubleValue();
-            return new Vector(x, y, z);
-        } catch (ClassCastException | NullPointerException e) {
-            return null;
-        }
     }
 }

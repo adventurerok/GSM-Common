@@ -1,8 +1,5 @@
 package com.ithinkrok.util.config;
 
-import org.apache.commons.lang.ArrayUtils;
-
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -36,6 +33,12 @@ public interface Config {
 
     Set<String> getKeys(boolean deep);
 
+    /**
+     * Finds and retrieves the object at the given path. If the path is empty, returns this object.
+     *
+     * @param path The path of the object
+     * @return The object at the given path, or null if not found
+     */
     default Object get(String path) {
         return get(path, null);
     }
@@ -211,7 +214,7 @@ public interface Config {
      * @param <T> The type of the object
      * @return The (now modified) object
      */
-    default <T> T setObjectFields(T object) {
+    default <T> T saveObjectFields(T object) {
         Field[] fields = object.getClass().getDeclaredFields();
 
         for(Field field : fields) {
