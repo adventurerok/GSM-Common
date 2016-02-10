@@ -6,9 +6,9 @@ import java.util.*;
 
 /**
  * Created by paul on 08/02/16.
- *
+ * <p>
  * Represents a config.
- *
+ * <p>
  * Configs should only store primitives, arrays/lists, strings and other configs.
  */
 public interface Config {
@@ -44,6 +44,8 @@ public interface Config {
     }
 
     Object get(String path, Object def);
+
+    char getSeparator();
 
     default String getString(String path) {
         return getString(path, null);
@@ -195,36 +197,24 @@ public interface Config {
         return get(path) instanceof Config;
     }
 
-    default <T> T getType(String path, Class<T> type) {
-        return getType(path, null, type);
-    }
-
-    @SuppressWarnings("unchecked")
-    default <T> T getType(String path, T def, Class<T> type) {
-        Object obj = get(path);
-
-        if (!type.isInstance(obj)) return def;
-        return (T) obj;
-    }
-
     /**
      * Modifies the fields of the object passed in to the values specified in this config.
      *
      * @param object The object to modify the fields of.
-     * @param <T> The type of the object
+     * @param <T>    The type of the object
      * @return The (now modified) object
      */
     default <T> T saveObjectFields(T object) {
         Field[] fields = object.getClass().getDeclaredFields();
 
-        for(Field field : fields) {
+        for (Field field : fields) {
             field.setAccessible(true);
 
-            if(Modifier.isStatic(field.getModifiers())) continue;
-            if(Modifier.isTransient(field.getModifiers())) continue;
+            if (Modifier.isStatic(field.getModifiers())) continue;
+            if (Modifier.isTransient(field.getModifiers())) continue;
 
             Object newField = getType(field.getName(), field.getType());
-            if(newField == null) continue;
+            if (newField == null) continue;
 
             try {
                 field.set(object, newField);
@@ -235,5 +225,17 @@ public interface Config {
         }
 
         return object;
+    }
+
+    default <T> T getType(String path, Class<T> type) {
+        return getType(path, null, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    default <T> T getType(String path, T def, Class<T> type) {
+        Object obj = get(path);
+
+        if (!type.isInstance(obj)) return def;
+        return (T) obj;
     }
 }
