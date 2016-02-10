@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by paul on 10/02/16.
  */
-public class ConfigLoader {
+public class YamlConfigIO {
 
     private static final ThreadLocal<Yaml> yamlThreadLocal = new ThreadLocal<>();
 
