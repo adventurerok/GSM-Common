@@ -32,18 +32,27 @@ public class YamlConfigIO {
         return loadToConfig(Files.newBufferedReader(path), config);
     }
 
-    public static Config loadToConfig(InputStream input, Config config) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> values = (Map<String, Object>) getYaml().load(input);
-
+    @SuppressWarnings("unchecked")
+    public static Config loadToConfig(InputStream input, Config config) throws InvalidConfigException {
+        Map<String, Object> values;
+        try {
+            values = (Map<String, Object>) getYaml().load(input);
+        } catch (Exception e) {
+            throw new InvalidConfigException("Error while loading config", e);
+        }
         config.setAll(values);
 
         return config;
     }
 
-    public static Config loadToConfig(Reader input, Config config) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> values = (Map<String, Object>) getYaml().load(input);
+    @SuppressWarnings("unchecked")
+    public static Config loadToConfig(Reader input, Config config) throws InvalidConfigException {
+        Map<String, Object> values;
+        try {
+            values = (Map<String, Object>) getYaml().load(input);
+        } catch (Exception e) {
+            throw new InvalidConfigException("Error while loading config", e);
+        }
 
         config.setAll(values);
 
