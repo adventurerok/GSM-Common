@@ -21,6 +21,9 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
     static void writeConfig(Config config, ByteBuf out, boolean writeType) {
         if(writeType) out.writeByte(ConfigType.CONFIG);
 
+        //Only support config separators that use char codes from 0-255
+        out.writeByte(config.getSeparator() & 0xFF);
+
         Set<String> keys = config.getKeys(false);
 
         PacketUtils.writeVarInt(keys.size(), out);

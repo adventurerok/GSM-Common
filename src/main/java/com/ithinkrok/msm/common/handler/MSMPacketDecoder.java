@@ -19,9 +19,11 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
 
     static Config readConfig(ByteBuf msg) {
+        char separator = (char)(msg.readByte() & 0xFF);
+
         int size = PacketUtils.readVarInt(msg);
 
-        Config config = new MemoryConfig();
+        Config config = new MemoryConfig(separator);
 
         for (int count = 0; count < size; ++count) {
             String key = PacketUtils.readString(msg);
