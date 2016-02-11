@@ -21,16 +21,16 @@ public class MemoryConfig implements Config {
     }
 
     @SuppressWarnings("unchecked")
-    public MemoryConfig(Map<String, Object> values) {
+    public MemoryConfig(Map<String, ?> values) {
         this(values, '.');
     }
 
     @SuppressWarnings("unchecked")
-    public MemoryConfig(Map<String, Object> values, char separator) {
+    public MemoryConfig(Map<String, ?> values, char separator) {
         this.separator = separator;
         this.values = new LinkedHashMap<>();
 
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
+        for (Map.Entry<String, ?> entry : values.entrySet()) {
             //Correct maps to configs is now done in the set() method
             set(entry.getKey(), entry.getValue());
         }
