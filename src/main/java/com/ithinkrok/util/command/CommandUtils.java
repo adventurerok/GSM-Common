@@ -95,7 +95,7 @@ public class CommandUtils {
      * @return A parameter map, with the default arguments stored in a list with the key "default"
      */
     public static Map<String, Object> parseArgumentListToMap(List<String> correctedArgs) {
-        List<Object> defaultArguments = new ArrayList<>();
+        List<String> defaultArguments = new ArrayList<>();
         Map<String, Object> arguments = new HashMap<>();
 
         String key = null;
@@ -104,8 +104,9 @@ public class CommandUtils {
             if (arg.startsWith("-") && arg.length() > 1 && isValidParameterName(arg.substring(1))) {
                 key = arg.substring(1);
             } else {
+                //Parameters are still parsed, but arguments are not
                 if (key != null) arguments.put(key, parse(arg));
-                else defaultArguments.add(parse(arg));
+                else defaultArguments.add(arg);
                 key = null;
             }
         }

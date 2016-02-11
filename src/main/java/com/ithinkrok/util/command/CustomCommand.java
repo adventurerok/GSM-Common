@@ -12,9 +12,9 @@ public class CustomCommand {
 
     private final String command;
     private final Map<String, Object> params;
-    private final List<Object> defaultArgs;
+    private final List<String> defaultArgs;
 
-    public CustomCommand(String commandName, Map<String, Object> params, List<Object> defaultArgs) {
+    public CustomCommand(String commandName, Map<String, Object> params, List<String> defaultArgs) {
         this.command = commandName;
         this.params = params;
         this.defaultArgs = defaultArgs;
@@ -28,14 +28,14 @@ public class CustomCommand {
         params = CommandUtils.parseArgumentListToMap(args);
 
         //noinspection unchecked
-        defaultArgs = (List<Object>) params.get("default");
+        defaultArgs = (List<String>) params.get("default");
     }
 
     public Map<String, Object> getParameters() {
         return params;
     }
 
-    public List<Object> getArgs() {
+    public List<String> getArgs() {
         return defaultArgs;
     }
 
@@ -45,8 +45,8 @@ public class CustomCommand {
 
     public double getDoubleArg(int index, double def) {
         try {
-            return ((Number) defaultArgs.get(index)).doubleValue();
-        } catch (Exception e) {
+            return Double.parseDouble(defaultArgs.get(index));
+        } catch (Exception ignored) {
             return def;
         }
     }
@@ -63,7 +63,7 @@ public class CustomCommand {
 
     public int getIntArg(int index, int def) {
         try {
-            return ((Number) defaultArgs.get(index)).intValue();
+            return Integer.parseInt(defaultArgs.get(index));
         } catch (Exception ignored) {
             return def;
         }
@@ -86,14 +86,27 @@ public class CustomCommand {
     }
 
     public boolean hasIntArg(int index) {
-        if (!hasDoubleArg(index)) return false;
+        if(!hasArg(index)) return false;
 
-        Number num = (Number) defaultArgs.get(index);
-        return num.intValue() == num.doubleValue();
+        try{
+            //noinspection ResultOfMethodCallIgnored
+            Integer.parseInt(defaultArgs.get(index));
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 
     public boolean hasDoubleArg(int index) {
-        return hasArg(index) && defaultArgs.get(index) instanceof Number;
+        if(!hasArg(index)) return false;
+
+        try{
+            //noinspection ResultOfMethodCallIgnored
+            Double.parseDouble(defaultArgs.get(index));
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 
     public boolean hasArg(int index) {
@@ -101,16 +114,33 @@ public class CustomCommand {
     }
 
     public boolean getBooleanArg(int index, boolean def) {
-        try {
-            return ((Boolean) defaultArgs.get(index));
-        } catch (Exception e) {
-            return def;
+        if(!hasArg(index)) return def;
+
+        switch(defaultArgs.get(index).toLowerCase()) {
+            case "true":
+            case "yes":
+                return true;
+            case "false":
+            case "no":
+                return false;
+            default:
+                return def;
         }
     }
 
 
     public boolean hasBooleanArg(int index) {
-        return hasArg(index) && defaultArgs.get(index) instanceof Boolean;
+        if(!hasArg(index)) return false;
+
+        switch(defaultArgs.get(index)) {
+            case "true":
+            case "yes":
+            case "false":
+            case "no":
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean hasParameter(String name) {
@@ -136,7 +166,7 @@ public class CustomCommand {
     public CustomCommand subCommand() {
         if (defaultArgs.size() < 1) return null;
 
-        List<Object> newArgs = new ArrayList<>();
+        List<String> newArgs = new ArrayList<>();
 
         for (int index = 1; index < defaultArgs.size(); ++index) newArgs.add(defaultArgs.get(index));
 
