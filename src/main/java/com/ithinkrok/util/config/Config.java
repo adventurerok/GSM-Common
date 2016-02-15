@@ -223,8 +223,30 @@ public interface Config {
                 if (field.getType().equals(double.class)) {
                     if (!isNumber(field.getName())) continue;
                     field.setDouble(object, getDouble(field.getName()));
+                } else if(field.getType().equals(float.class)) {
+                    if(!isNumber(field.getName())) continue;
+                    field.setFloat(object, (float) getDouble(field.getName()));
+                } else if(field.getType().equals(int.class)) {
+                    if(!isNumber(field.getName())) continue;
+                    field.setInt(object, getInt(field.getName()));
+                } else if(field.getType().equals(boolean.class)) {
+                    if(!isBoolean(field.getName())) continue;
+                    field.setBoolean(object, getBoolean(field.getName()));
+                } else if(field.getType().equals(long.class)) {
+                    if(!isNumber(field.getName())) continue;
+                    field.setLong(object, getLong(field.getName()));
+                } else if(field.getType().equals(short.class)) {
+                    if(!isNumber(field.getName())) continue;
+                    field.setShort(object, (short) getInt(field.getName()));
+                } else if(field.getType().equals(byte.class)) {
+                    if(!isNumber(field.getName())) continue;
+                    field.setByte(object, (byte) getInt(field.getName()));
+                } else {
+                    Object newValue = getType(field.getName(), field.getType());
+                    if(newValue == null) continue;
+
+                    field.set(object, newValue);
                 }
-                //TODO finish
 
             } catch (IllegalAccessException e) {
                 //This should not happen hopefully.
