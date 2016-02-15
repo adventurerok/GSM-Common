@@ -37,6 +37,7 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
 
     static void write(Object obj, ByteBuf out, boolean writeType) {
         if (obj instanceof String) writeString((String) obj, out, writeType);
+        else if(obj instanceof UUID) writeString(obj.toString(), out, writeType);
         else if (obj instanceof Number) writeNumber((Number) obj, out, writeType);
         else if (obj instanceof Config) writeConfig((Config) obj, out, writeType);
         else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
