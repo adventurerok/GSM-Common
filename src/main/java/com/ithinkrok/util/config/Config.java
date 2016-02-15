@@ -92,6 +92,10 @@ public interface Config {
         return get(path) instanceof Boolean;
     }
 
+    default boolean isNumber(String path) {
+        return get(path) instanceof Number;
+    }
+
     default double getDouble(String path) {
         return getDouble(path, 0.0d);
     }
@@ -213,11 +217,15 @@ public interface Config {
             if (Modifier.isStatic(field.getModifiers())) continue;
             if (Modifier.isTransient(field.getModifiers())) continue;
 
-            Object newField = getType(field.getName(), field.getType());
-            if (newField == null) continue;
+            if (!contains(field.getName())) continue;
 
             try {
-                field.set(object, newField);
+                if (field.getType().equals(double.class)) {
+                    if (!isNumber(field.getName())) continue;
+                    field.setDouble(object, getDouble(field.getName()));
+                }
+                //TODO finish
+
             } catch (IllegalAccessException e) {
                 //This should not happen hopefully.
                 e.printStackTrace();
