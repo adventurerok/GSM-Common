@@ -2,6 +2,7 @@ package com.ithinkrok.msm.common.util.io;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -65,7 +66,18 @@ public class DirectoryWatcher {
         }
     }
 
-    private static class PathListenerGroup {
+    public void unregisterAllListeners(Path path) {
+        Iterator<PathListenerGroup> iterator = targets.iterator();
+
+        while(iterator.hasNext()) {
+            PathListenerGroup next = iterator.next();
+
+            if(!next.path.equals(path)) continue;
+            iterator.remove();
+        }
+    }
+
+    private static final class PathListenerGroup {
 
         Path path;
         List<DirectoryListener> listeners = new CopyOnWriteArrayList<>();
