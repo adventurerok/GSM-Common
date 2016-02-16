@@ -88,6 +88,7 @@ public class DirectoryWatcher {
         }
 
         private void add(DirectoryListener listener) {
+            if(listeners.contains(listener)) return;
             listeners.add(listener);
         }
 
@@ -96,7 +97,7 @@ public class DirectoryWatcher {
         }
     }
 
-    private class WatcherThread extends Thread {
+    private final class WatcherThread extends Thread {
 
         private boolean stop;
 
