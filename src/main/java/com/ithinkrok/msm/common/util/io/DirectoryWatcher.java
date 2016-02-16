@@ -133,7 +133,7 @@ public class DirectoryWatcher {
 
                     for (PathListenerGroup pathListenerGroup : targets) {
                         //Made sure the listeners in this group are listening for this directory
-                        if (!changed.equals(pathListenerGroup.path)) continue;
+                        if (!changed.getParent().equals(pathListenerGroup.path)) continue;
 
                         for (DirectoryListener listener : pathListenerGroup.listeners) {
                             try {
