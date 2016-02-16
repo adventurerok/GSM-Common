@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -11,7 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DirectoryWatcher {
 
-    private final List<PathListenerGroup> targets = new CopyOnWriteArrayList<>();
+    @SuppressWarnings("UseOfObsoleteCollectionType")
+    private final List<PathListenerGroup> targets = new Vector<>();
 
     private final WatchService watcher;
 
