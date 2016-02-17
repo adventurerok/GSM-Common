@@ -1,13 +1,12 @@
 package com.ithinkrok.util.config;
 
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 10/02/16.
@@ -30,6 +29,18 @@ public class YamlConfigIO {
 
     public static Config loadToConfig(Path path, Config config) throws IOException {
         return loadToConfig(Files.newBufferedReader(path), config);
+    }
+
+    public static void saveConfig(Writer output, Config config) {
+        getYaml().dump(ConfigUtils.toMap(config), output);
+    }
+
+    public static void saveConfig(OutputStream output, Config config) {
+        saveConfig(new OutputStreamWriter(output), config);
+    }
+
+    public static void saveConfig(Path path, Config config) throws IOException {
+        saveConfig(Files.newBufferedWriter(path), config);
     }
 
     @SuppressWarnings("unchecked")
@@ -58,5 +69,7 @@ public class YamlConfigIO {
 
         return config;
     }
+
+
 
 }
