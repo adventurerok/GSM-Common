@@ -1,7 +1,5 @@
 package com.ithinkrok.util.lang;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,10 +16,6 @@ import java.util.Properties;
 public class LangFile implements LanguageLookup {
 
     private final Map<Object, String> languageStrings = new HashMap<>();
-
-    public LangFile(File in) throws IOException {
-        this(new FileInputStream(in));
-    }
 
     public LangFile(Path in) throws IOException {
         this(Files.newInputStream(in));
