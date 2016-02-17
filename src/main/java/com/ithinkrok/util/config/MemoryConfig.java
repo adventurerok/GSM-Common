@@ -178,7 +178,7 @@ public class MemoryConfig implements Config {
         Object obj = values.get(name);
 
         if (obj == null) {
-            obj = new MemoryConfig();
+            obj = new MemoryConfig(separator);
             values.put(name, obj);
         } else if (!(obj instanceof Config)) {
             throw new RuntimeException("Object at path " + name + " is not a config");
