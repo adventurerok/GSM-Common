@@ -1,6 +1,7 @@
 package com.ithinkrok.msm.common.util;
 
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -63,5 +64,15 @@ public class ConfigUtils {
         }
 
         return object;
+    }
+
+    public static List<Config> collectionToConfigList(Iterable<? extends ConfigSerializable> input) {
+        List<Config> output = new ArrayList<>();
+
+        for(ConfigSerializable object : input) {
+            output.add(object.toConfig());
+        }
+
+        return output;
     }
 }
