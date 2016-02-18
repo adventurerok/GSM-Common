@@ -157,7 +157,6 @@ public class CustomEventExecutor {
 
             if (priorityCompare != 0) return priorityCompare;
 
-            //TODO possible speed improvement here
             return method.toString().compareTo(o.method.toString());
         }
 
