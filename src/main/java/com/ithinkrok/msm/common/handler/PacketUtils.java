@@ -4,9 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by paul on 28/01/16.
  */
