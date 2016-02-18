@@ -29,7 +29,7 @@ public class CustomCommand {
 
         for(Map.Entry<String, Object> param : params.entrySet()) {
             if(param.getKey().equals("default")) continue;
-            if(ArrayUtils.contains(ignoreParams, param)) continue;
+            if(ArrayUtils.contains(ignoreParams, param.getKey())) continue;
 
             if(!appendSpace) appendSpace = true;
             else result.append(' ');
@@ -107,11 +107,13 @@ public class CustomCommand {
     }
 
     public String getRemainingArgsAndParamsAsString(int index, String...ignoreParams) {
-        StringBuilder result = new StringBuilder(parametersToString(ignoreParams));
+        StringBuilder result = new StringBuilder(getRemainingArgsAsString(index));
 
-        if(result.length() != 0 && hasArg(index)) result.append(' ');
+        String params = parametersToString(ignoreParams);
 
-        result.append(getRemainingArgsAsString(index));
+        if(result.length() != 0 && !params.isEmpty()) result.append(' ');
+
+        result.append(params);
 
         return result.toString();
     }
