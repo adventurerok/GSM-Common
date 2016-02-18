@@ -1,5 +1,7 @@
 package com.ithinkrok.util.command;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +22,14 @@ public class CustomCommand {
         this.defaultArgs = defaultArgs;
     }
 
-    public String parametersToString() {
+    public String parametersToString(String...ignoreParams) {
         StringBuilder result = new StringBuilder();
         boolean appendSpace = false;
 
 
         for(Map.Entry<String, Object> param : params.entrySet()) {
             if(param.getKey().equals("default")) continue;
+            if(ArrayUtils.contains(ignoreParams, param)) continue;
 
             if(!appendSpace) appendSpace = true;
             else result.append(' ');
@@ -103,8 +106,8 @@ public class CustomCommand {
         return result.toString();
     }
 
-    public String getRemainingArgsAndParamsAsString(int index) {
-        StringBuilder result = new StringBuilder(parametersToString());
+    public String getRemainingArgsAndParamsAsString(int index, String...ignoreParams) {
+        StringBuilder result = new StringBuilder(parametersToString(ignoreParams));
 
         if(result.length() != 0 && hasArg(index)) result.append(' ');
 
@@ -213,7 +216,7 @@ public class CustomCommand {
     public boolean getBooleanParam(String name, boolean def) {
         try {
             return (Boolean) params.get(name);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return def;
         }
     }
