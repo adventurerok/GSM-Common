@@ -3,7 +3,6 @@ package com.ithinkrok.msm.common.handler;
 
 import com.ithinkrok.util.config.MemoryConfig;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

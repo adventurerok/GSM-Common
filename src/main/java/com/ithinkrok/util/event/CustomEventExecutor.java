@@ -1,8 +1,5 @@
 package com.ithinkrok.util.event;
 
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.EventException;
-
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -146,7 +143,7 @@ public class CustomEventExecutor {
             try {
                 method.invoke(listener, event);
             } catch (Exception e) {
-                throw new EventException(e, "Failed while calling event method: " + method.getName());
+                throw new EventException("Failed while calling event method: " + method.getName(), e);
             }
         }
 

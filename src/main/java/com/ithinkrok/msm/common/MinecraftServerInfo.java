@@ -2,8 +2,6 @@ package com.ithinkrok.msm.common;
 
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
