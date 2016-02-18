@@ -20,6 +20,24 @@ public class CustomCommand {
         this.defaultArgs = defaultArgs;
     }
 
+    public String parametersToString() {
+        StringBuilder result = new StringBuilder();
+        boolean appendSpace = false;
+
+
+        for(Map.Entry<String, Object> param : params.entrySet()) {
+            if(param.getKey().equals("default")) continue;
+
+            if(!appendSpace) appendSpace = true;
+            else result.append(' ');
+
+            result.append('-').append(param.getKey());
+            result.append(' ').append(param.getValue());
+        }
+
+        return result.toString();
+    }
+
     public CustomCommand(String fullCommand) {
         List<String> args = CommandUtils.splitStringIntoArguments(fullCommand);
 
@@ -81,6 +99,16 @@ public class CustomCommand {
 
             result.append(String.valueOf(defaultArgs.get(count)));
         }
+
+        return result.toString();
+    }
+
+    public String getRemainingArgsAndParamsAsString(int index) {
+        StringBuilder result = new StringBuilder(parametersToString());
+
+        if(result.length() != 0 && hasArg(index)) result.append(' ');
+
+        result.append(getRemainingArgsAsString(index));
 
         return result.toString();
     }
