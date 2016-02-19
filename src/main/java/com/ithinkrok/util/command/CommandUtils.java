@@ -103,6 +103,12 @@ public class CommandUtils {
         for (String arg : correctedArgs) {
             if (arg.startsWith("-") && arg.length() > 1 && isValidParameterName(arg.substring(1))) {
                 key = arg.substring(1);
+
+                //Support for boolean flags e.g. -w!
+                if(key.endsWith("!")) {
+                    arguments.put(key.substring(0, key.length() - 1), true);
+                    key = null;
+                }
             } else {
                 //Parameters are still parsed, but arguments are not
                 if (key != null) arguments.put(key, parse(arg));
