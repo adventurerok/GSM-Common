@@ -131,7 +131,11 @@ public class CommandUtils {
         for (int index = 0; index < arg.length(); ++index) {
             char c = arg.charAt(index);
 
-            if (!Character.isLetter(c) && !Character.isDigit(c) && c != '_') return false;
+            //Make shorthand flags work
+            if (!Character.isLetter(c) && !Character.isDigit(c) && c != '_'){
+                if(index == arg.length() - 1 && c == '!') continue;
+                return false;
+            }
         }
 
         return true;
