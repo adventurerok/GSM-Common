@@ -77,6 +77,21 @@ public interface Config {
         return get(path) instanceof Integer;
     }
 
+    default short getShort(String path) {
+        return getShort(path, 0);
+    }
+
+    default short getShort(String path, int def) {
+        Object obj = get(path);
+
+        if (obj instanceof Number) return ((Number) obj).shortValue();
+        else return (short) def;
+    }
+
+    default boolean isShort(String path) {
+        return get(path) instanceof Short;
+    }
+
     default boolean getBoolean(String path) {
         return getBoolean(path, false);
     }
