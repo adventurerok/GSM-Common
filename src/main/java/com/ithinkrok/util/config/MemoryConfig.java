@@ -99,7 +99,7 @@ public class MemoryConfig implements Config {
     }
 
     @Override
-    public void set(String path, Object value) {
+    public Config set(String path, Object value) {
         Validate.notEmpty(path, "Cannot set an empty path");
 
         int splitterIndex = path.indexOf(separator);
@@ -113,6 +113,8 @@ public class MemoryConfig implements Config {
         } else {
             values.put(path, correctMapsToConfigs(value));
         }
+
+        return this;
     }
 
     @Override

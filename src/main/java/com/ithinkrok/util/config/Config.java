@@ -23,7 +23,7 @@ public interface Config {
         }
     }
 
-    void set(String path, Object value);
+    Config set(String path, Object value);
 
     default void setAll(Config values) {
         for (String path : values.getKeys(true)) {

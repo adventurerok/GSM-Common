@@ -37,8 +37,10 @@ public class WrapperConfig implements Config {
     }
 
     @Override
-    public void set(String path, Object value) {
+    public Config set(String path, Object value) {
         wrappedConfig.set(path, value);
+
+        return this;
     }
 
     @Override
