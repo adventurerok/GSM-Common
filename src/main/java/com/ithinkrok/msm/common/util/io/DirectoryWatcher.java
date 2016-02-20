@@ -2,6 +2,7 @@ package com.ithinkrok.msm.common.util.io;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -114,7 +115,7 @@ public class DirectoryWatcher {
                 WatchKey key;
                 try {
                     key = watcher.take();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                     return;
                 }
 
@@ -130,6 +131,8 @@ public class DirectoryWatcher {
                     Path file = watchEvent.context();
 
                     Path changed = dir.resolve(file);
+
+                    List<PathListenerGroup> targets = new ArrayList<>(DirectoryWatcher.this.targets);
 
                     for (PathListenerGroup pathListenerGroup : targets) {
                         //Made sure the listeners in this group are listening for this directory
