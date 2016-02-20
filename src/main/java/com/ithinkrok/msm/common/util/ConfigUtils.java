@@ -50,4 +50,32 @@ public class ConfigUtils {
 
         return output;
     }
+
+    public static String formatString(String str, Config config) {
+        StringBuilder result = new StringBuilder();
+
+        StringBuilder key = new StringBuilder();
+
+        boolean inBrackets = false;
+
+        for(int index = 0; index < str.length(); ++index) {
+            char c = str.charAt(index);
+
+            if(inBrackets) {
+                if(c == '}') {
+                    result.append(config.get(key.toString()));
+
+                    key = new StringBuilder();
+                } else {
+                    key.append(c);
+                }
+            } else if(c == '{') {
+                inBrackets = true;
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
+    }
 }
