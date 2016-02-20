@@ -12,4 +12,8 @@ public final class StringUtils {
     public static String removeMinecraftChatCodes(String input) {
         return input.replaceAll("[§&][0-9a-zA-Z]", "");
     }
+
+    public static String convertAmpersandToSelectionCharacter(String message) {
+        return message.replace('&', '§');
+    }
 }
