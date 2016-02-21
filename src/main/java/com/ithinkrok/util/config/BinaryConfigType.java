@@ -1,9 +1,9 @@
-package com.ithinkrok.msm.common.handler;
+package com.ithinkrok.util.config;
 
 /**
  * Created by paul on 28/01/16.
  */
-public class ConfigType {
+public class BinaryConfigType {
 
     /**
      * Use only for as a list type for lists with multiple data types

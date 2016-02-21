@@ -1,9 +1,12 @@
 package com.ithinkrok.msm.common.handler;
 
 import com.ithinkrok.msm.common.Packet;
+import com.ithinkrok.util.config.BinaryConfigIO;
+import com.ithinkrok.util.config.BinaryConfigType;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
@@ -15,89 +18,13 @@ import java.util.List;
  */
 public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-
-    static Config readConfig(ByteBuf msg) {
-        char separator = (char)(msg.readByte() & 0xFF);
-
-        int size = PacketUtils.readVarInt(msg);
-
-        Config config = new MemoryConfig(separator);
-
-        for (int count = 0; count < size; ++count) {
-            String key = PacketUtils.readString(msg);
-            Object value = read(msg);
-
-            config.set(key, value);
-        }
-
-        return config;
-    }
-
-    static Object read(ByteBuf msg) {
-        int type = msg.readByte() & 0xFF;
-
-        return read(msg, type);
-    }
-
-    private static Object read(ByteBuf msg, int type) {
-        switch (type) {
-            case ConfigType.STRING:
-                return PacketUtils.readString(msg);
-            case ConfigType.VAR_INT:
-                return PacketUtils.readVarInt(msg);
-            case ConfigType.FLOAT:
-                return msg.readFloat();
-            case ConfigType.DOUBLE:
-                return msg.readDouble();
-            case ConfigType.BYTE:
-                return msg.readByte();
-            case ConfigType.VAR_LONG:
-                return PacketUtils.readVarLong(msg);
-            case ConfigType.CHAR:
-                return msg.readChar();
-            case ConfigType.CONFIG:
-                return readConfig(msg);
-            case ConfigType.BYTE_ARRAY:
-                return readByteArray(msg);
-            case ConfigType.BOOLEAN:
-                return msg.readBoolean();
-            case ConfigType.NULL:
-                return null;
-            default:
-                if ((type & ConfigType.LIST_MASK) == ConfigType.LIST_MASK) {
-                    return readList(msg, type);
-                } else throw new UnsupportedOperationException("Unsupported data type:" + type);
-        }
-    }
-
-    private static byte[] readByteArray(ByteBuf msg) {
-        int length = PacketUtils.readVarInt(msg);
-
-        byte[] result = new byte[length];
-        msg.readBytes(result);
-
-        return result;
-    }
-
-    private static List<?> readList(ByteBuf msg, int type) {
-        type ^= ConfigType.LIST_MASK;
-
-        int size = PacketUtils.readVarInt(msg);
-        List<Object> list = new ArrayList<>(size);
-
-        for (int count = 0; count < size; ++count) {
-            if (type == ConfigType.OBJECT) list.add(read(msg));
-            else list.add(read(msg, type));
-        }
-
-        return list;
-    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        int id = PacketUtils.readVarInt(msg);
+        ByteBufInputStream in = new ByteBufInputStream(msg);
 
-        Config payload = readConfig(msg);
+        int id = PacketUtils.readVarInt(in);
+
+        Config payload = BinaryConfigIO.loadConfig(in);
 
         out.add(new Packet(id, payload));
     }
