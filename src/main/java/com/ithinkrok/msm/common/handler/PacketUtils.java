@@ -2,6 +2,7 @@ package com.ithinkrok.msm.common.handler;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import io.netty.buffer.ByteBuf;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -21,7 +22,27 @@ public class PacketUtils {
         buf.write(b);
     }
 
+    @SuppressWarnings("Duplicates")
     public static void writeVarInt(int value, DataOutput output) throws IOException {
+        int part;
+        while (true) {
+            part = value & 0x7F;
+
+            value >>>= 7;
+            if (value != 0) {
+                part |= 0x80;
+            }
+
+            output.writeByte(part);
+
+            if (value == 0) {
+                break;
+            }
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static void writeVarInt(int value, ByteBuf output) throws IOException {
         int part;
         while (true) {
             part = value & 0x7F;
@@ -56,6 +77,32 @@ public class PacketUtils {
 
     @SuppressWarnings("Duplicates")
     public static int readVarInt(DataInput input, int maxBytes) throws IOException {
+        int out = 0;
+        int bytes = 0;
+        byte in;
+        while (true) {
+            in = input.readByte();
+
+            out |= (in & 0x7F) << (bytes++ * 7);
+
+            if (bytes > maxBytes) {
+                throw new RuntimeException("VarInt too big");
+            }
+
+            if ((in & 0x80) != 0x80) {
+                break;
+            }
+        }
+
+        return out;
+    }
+
+    public static int readVarInt(ByteBuf input) {
+        return readVarInt(input, 5);
+    }
+
+    @SuppressWarnings("Duplicates")
+    public static int readVarInt(ByteBuf input, int maxBytes) {
         int out = 0;
         int bytes = 0;
         byte in;
