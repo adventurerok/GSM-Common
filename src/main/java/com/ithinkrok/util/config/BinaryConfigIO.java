@@ -2,9 +2,9 @@ package com.ithinkrok.util.config;
 
 import com.ithinkrok.msm.common.handler.PacketUtils;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -16,12 +16,28 @@ public class BinaryConfigIO {
         writeConfig(config, output, false);
     }
 
+    public static void saveConfig(OutputStream out, Config config) throws IOException {
+        saveConfig((DataOutput) new DataOutputStream(out), config);
+    }
+
+    public static void saveConfig(Path path, Config config) throws IOException {
+        saveConfig(Files.newOutputStream(path), config);
+    }
+
     public static Config loadConfig(DataInput input) throws IOException {
         return readConfig(input);
     }
 
+    public static Config loadConfig(InputStream input) throws IOException {
+        return loadConfig((DataInput) new DataInputStream(input));
+    }
+
+    public static Config loadConfig(Path path) throws IOException {
+        return loadConfig(Files.newInputStream(path));
+    }
+
     static Config readConfig(DataInput msg) throws IOException {
-        char separator = (char)(msg.readByte() & 0xFF);
+        char separator = (char) (msg.readByte() & 0xFF);
 
         int size = PacketUtils.readVarInt(msg);
 
@@ -98,7 +114,7 @@ public class BinaryConfigIO {
     }
 
     private static void writeConfig(Config config, DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.CONFIG);
+        if (writeType) out.writeByte(BinaryConfigType.CONFIG);
 
         //Only support config separators that use char codes from 0-255
         out.writeByte(config.getSeparator() & 0xFF);
@@ -116,30 +132,30 @@ public class BinaryConfigIO {
 
     static void write(Object obj, DataOutput out, boolean writeType) throws IOException {
         if (obj instanceof String) writeString((String) obj, out, writeType);
-        else if(obj instanceof UUID) writeString(obj.toString(), out, writeType);
+        else if (obj instanceof UUID) writeString(obj.toString(), out, writeType);
         else if (obj instanceof Number) writeNumber((Number) obj, out, writeType);
         else if (obj instanceof Config) writeConfig((Config) obj, out, writeType);
-        else if(obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>)obj, out, writeType);
+        else if (obj instanceof Map<?, ?>) writeMapConfig((Map<?, ?>) obj, out, writeType);
         else if (obj instanceof Character) writeChar((Character) obj, out, writeType);
         else if (obj instanceof Collection<?>) writeList((Collection<?>) obj, out, writeType);
-        else if(obj instanceof byte[]) writeByteArray((byte[]) obj, out, writeType);
-        else if(obj instanceof Boolean) writeBoolean((Boolean)obj, out, writeType);
-        else if(obj == null) writeNull(out, writeType);
+        else if (obj instanceof byte[]) writeByteArray((byte[]) obj, out, writeType);
+        else if (obj instanceof Boolean) writeBoolean((Boolean) obj, out, writeType);
+        else if (obj == null) writeNull(out, writeType);
         else throw new UnsupportedOperationException("Unsupported object type: " + obj.getClass());
     }
 
     private static void writeNull(DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.NULL);
+        if (writeType) out.writeByte(BinaryConfigType.NULL);
     }
 
     private static void writeBoolean(Boolean obj, DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.BOOLEAN);
+        if (writeType) out.writeByte(BinaryConfigType.BOOLEAN);
 
         out.writeBoolean(obj);
     }
 
     private static void writeByteArray(byte[] obj, DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.BYTE_ARRAY);
+        if (writeType) out.writeByte(BinaryConfigType.BYTE_ARRAY);
 
         PacketUtils.writeVarInt(obj.length, out);
         out.write(obj);
@@ -155,7 +171,7 @@ public class BinaryConfigIO {
 
     static void writeList(Collection<?> list, DataOutput out, boolean writeType) throws IOException {
         int listType = getListType(list);
-        if(writeType) out.writeByte(listType);
+        if (writeType) out.writeByte(listType);
 
         PacketUtils.writeVarInt(list.size(), out);
 
@@ -196,42 +212,42 @@ public class BinaryConfigIO {
         else if (o instanceof Collection<?>) return BinaryConfigType.LIST_MASK;
         else if (o instanceof byte[]) return BinaryConfigType.BYTE_ARRAY;
         else if (o instanceof Boolean) return BinaryConfigType.BOOLEAN;
-        else if(o == null) return BinaryConfigType.NULL;
+        else if (o == null) return BinaryConfigType.NULL;
         else throw new UnsupportedOperationException("Unsupported object type: " + o.getClass());
     }
 
     static void writeNumber(Number obj, DataOutput out, boolean writeType) throws IOException {
         if (obj instanceof Integer || obj instanceof Short) {
-            if(writeType) out.writeByte(BinaryConfigType.VAR_INT);
+            if (writeType) out.writeByte(BinaryConfigType.VAR_INT);
 
             PacketUtils.writeVarInt(obj.intValue(), out);
         } else if (obj instanceof Float) {
-            if(writeType) out.writeByte(BinaryConfigType.FLOAT);
+            if (writeType) out.writeByte(BinaryConfigType.FLOAT);
 
             out.writeFloat(obj.floatValue());
         } else if (obj instanceof Double) {
-            if(writeType) out.writeByte(BinaryConfigType.DOUBLE);
+            if (writeType) out.writeByte(BinaryConfigType.DOUBLE);
 
             out.writeDouble(obj.doubleValue());
         } else if (obj instanceof Byte) {
-            if(writeType) out.writeByte(BinaryConfigType.BYTE);
+            if (writeType) out.writeByte(BinaryConfigType.BYTE);
 
             out.writeByte(obj.byteValue());
         } else if (obj instanceof Long) {
-            if(writeType) out.writeByte(BinaryConfigType.VAR_LONG);
+            if (writeType) out.writeByte(BinaryConfigType.VAR_LONG);
 
             PacketUtils.writeVarLong(obj.longValue(), out);
         }
     }
 
     static void writeString(String str, DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.STRING);
+        if (writeType) out.writeByte(BinaryConfigType.STRING);
 
         PacketUtils.writeString(str, out);
     }
 
     static void writeChar(Character obj, DataOutput out, boolean writeType) throws IOException {
-        if(writeType) out.writeByte(BinaryConfigType.CHAR);
+        if (writeType) out.writeByte(BinaryConfigType.CHAR);
 
         out.writeChar(obj);
     }
