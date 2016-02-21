@@ -66,6 +66,7 @@ public class ConfigUtils {
                     result.append(config.get(key.toString()));
 
                     key = new StringBuilder();
+                    inBrackets = false;
                 } else {
                     key.append(c);
                 }
