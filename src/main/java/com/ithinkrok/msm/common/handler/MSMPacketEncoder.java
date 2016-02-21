@@ -9,6 +9,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import java.io.DataOutput;
 import java.util.*;
 
 /**
@@ -23,6 +24,6 @@ public class MSMPacketEncoder extends MessageToByteEncoder<Packet> {
         PacketUtils.writeVarInt(msg.getId(), out);
 
         Config payload = msg.getPayload();
-        BinaryConfigIO.saveConfig(out, payload);
+        BinaryConfigIO.saveConfig((DataOutput) out, payload);
     }
 }

@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.io.DataInput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class MSMPacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         int id = PacketUtils.readVarInt(in);
 
-        Config payload = BinaryConfigIO.loadConfig(in);
+        Config payload = BinaryConfigIO.loadConfig((DataInput) in);
 
         out.add(new Packet(id, payload));
     }
