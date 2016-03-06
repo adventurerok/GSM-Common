@@ -19,9 +19,9 @@ public class MinecraftClientInfo {
      */
     private final String name;
     /**
-     * The type of the minecraft server
+     * The subType of the minecraft server
      */
-    private MinecraftClientType type;
+    private MinecraftClientType subType;
     /**
      * If this minecraft server is in a bungeecord network
      */
@@ -37,9 +37,9 @@ public class MinecraftClientInfo {
      */
     private List<String> plugins;
 
-    public MinecraftClientInfo(MinecraftClientType type, String name, boolean hasBungee, int maxPlayerCount,
+    public MinecraftClientInfo(MinecraftClientType subType, String name, boolean hasBungee, int maxPlayerCount,
                                List<String> plugins) {
-        this.type = type;
+        this.subType = subType;
         this.name = name;
         this.hasBungee = hasBungee;
         this.maxPlayerCount = maxPlayerCount;
@@ -53,14 +53,14 @@ public class MinecraftClientInfo {
     }
 
     public void fromConfig(Config config) {
-        type = MinecraftClientType.valueOf(config.getString("type").toUpperCase());
+        subType = MinecraftClientType.valueOf(config.getString("subtype").toUpperCase());
         hasBungee = config.getBoolean("has_bungee");
         maxPlayerCount = config.getInt("max_players");
         plugins = config.getStringList("plugins");
     }
 
-    public MinecraftClientType getType() {
-        return type;
+    public MinecraftClientType getSubType() {
+        return subType;
     }
 
     public String getName() {
@@ -83,7 +83,7 @@ public class MinecraftClientInfo {
         Config config = new MemoryConfig();
 
         config.set("name", name);
-        config.set("type", type.toString().toLowerCase());
+        config.set("subtype", subType.toString().toLowerCase());
         config.set("has_bungee", hasBungee);
         config.set("max_players", maxPlayerCount);
         config.set("plugins", new ArrayList<>(plugins));
@@ -93,7 +93,7 @@ public class MinecraftClientInfo {
 
     @Override
     public int hashCode() {
-        int result = type.hashCode();
+        int result = subType.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + (hasBungee ? 1 : 0);
         result = 31 * result + maxPlayerCount;
@@ -110,7 +110,7 @@ public class MinecraftClientInfo {
 
         if (hasBungee != that.hasBungee) return false;
         if (maxPlayerCount != that.maxPlayerCount) return false;
-        if (type != that.type) return false;
+        if (subType != that.subType) return false;
         if (!name.equals(that.name)) return false;
         return plugins.equals(that.plugins);
 
@@ -119,7 +119,7 @@ public class MinecraftClientInfo {
     @Override
     public String toString() {
         return "MinecraftClientInfo{" +
-                "type=" + type +
+                "subtype=" + subType +
                 ", name='" + name + '\'' +
                 ", hasBungee=" + hasBungee +
                 ", maxPlayerCount=" + maxPlayerCount +
