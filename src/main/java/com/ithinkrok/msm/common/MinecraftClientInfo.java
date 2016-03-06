@@ -93,6 +93,7 @@ public class MinecraftClientInfo implements ClientInfo {
         Config config = new MemoryConfig();
 
         config.set("name", name);
+        config.set("type", "minecraft");
         config.set("subtype", subType.toString().toLowerCase());
         config.set("has_bungee", hasBungee);
         config.set("max_players", maxPlayerCount);
