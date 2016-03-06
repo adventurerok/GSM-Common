@@ -11,7 +11,7 @@ import java.util.List;
  * <p>
  * Represents
  */
-public class MinecraftServerInfo {
+public class MinecraftClientInfo {
 
     /**
      * The name of this minecraft server.
@@ -21,7 +21,7 @@ public class MinecraftServerInfo {
     /**
      * The type of the minecraft server
      */
-    private MinecraftServerType type;
+    private MinecraftClientType type;
     /**
      * If this minecraft server is in a bungeecord network
      */
@@ -37,7 +37,7 @@ public class MinecraftServerInfo {
      */
     private List<String> plugins;
 
-    public MinecraftServerInfo(MinecraftServerType type, String name, boolean hasBungee, int maxPlayerCount,
+    public MinecraftClientInfo(MinecraftClientType type, String name, boolean hasBungee, int maxPlayerCount,
                                List<String> plugins) {
         this.type = type;
         this.name = name;
@@ -46,20 +46,20 @@ public class MinecraftServerInfo {
         this.plugins = plugins;
     }
 
-    public MinecraftServerInfo(Config config) {
+    public MinecraftClientInfo(Config config) {
         name = config.getString("name");
 
         fromConfig(config);
     }
 
     public void fromConfig(Config config) {
-        type = MinecraftServerType.valueOf(config.getString("type").toUpperCase());
+        type = MinecraftClientType.valueOf(config.getString("type").toUpperCase());
         hasBungee = config.getBoolean("has_bungee");
         maxPlayerCount = config.getInt("max_players");
         plugins = config.getStringList("plugins");
     }
 
-    public MinecraftServerType getType() {
+    public MinecraftClientType getType() {
         return type;
     }
 
@@ -106,7 +106,7 @@ public class MinecraftServerInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MinecraftServerInfo that = (MinecraftServerInfo) o;
+        MinecraftClientInfo that = (MinecraftClientInfo) o;
 
         if (hasBungee != that.hasBungee) return false;
         if (maxPlayerCount != that.maxPlayerCount) return false;
@@ -118,7 +118,7 @@ public class MinecraftServerInfo {
 
     @Override
     public String toString() {
-        return "MinecraftServerInfo{" +
+        return "MinecraftClientInfo{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
                 ", hasBungee=" + hasBungee +
