@@ -11,13 +11,14 @@ import java.util.List;
  * <p>
  * Represents
  */
-public class MinecraftClientInfo {
+public class MinecraftClientInfo implements ClientInfo {
 
     /**
      * The name of this minecraft server.
      * Must be equal to the name in the bungeecord config for bungeecord network servers
      */
     private final String name;
+
     /**
      * The subType of the minecraft server
      */
@@ -52,6 +53,7 @@ public class MinecraftClientInfo {
         fromConfig(config);
     }
 
+    @Override
     public void fromConfig(Config config) {
         subType = MinecraftClientType.valueOf(config.getString("subtype").toUpperCase());
         hasBungee = config.getBoolean("has_bungee");
@@ -59,26 +61,34 @@ public class MinecraftClientInfo {
         plugins = config.getStringList("plugins");
     }
 
-    public MinecraftClientType getSubType() {
-        return subType;
-    }
-
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getType() {
+        return "minecraft";
+    }
+
+    @Override
+    public int getMaxPlayerCount() {
+        return maxPlayerCount;
+    }
+
+    public MinecraftClientType getSubType() {
+        return subType;
     }
 
     public boolean hasBungee() {
         return hasBungee;
     }
 
-    public int getMaxPlayerCount() {
-        return maxPlayerCount;
-    }
-
     public List<String> getPlugins() {
         return plugins;
     }
 
+    @Override
     public Config toConfig() {
         Config config = new MemoryConfig();
 
