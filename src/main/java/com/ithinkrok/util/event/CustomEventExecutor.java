@@ -14,25 +14,35 @@ public class CustomEventExecutor {
         executeListeners(event, getMethodExecutorMap(event, listeners));
     }
 
-    private static void executeListeners(CustomEvent event, Map<MethodExecutor, CustomListener> map) {
-        for (Map.Entry<MethodExecutor, CustomListener> entry : map.entrySet()) {
-            try {
-                entry.getKey().execute(entry.getValue(), event);
-            } catch (EventException e) {
-                System.out.println("Failed while calling event listener: " + entry.getValue().getClass());
-                e.printStackTrace();
+    private static void executeListeners(CustomEvent event, Map<MethodExecutor, Collection<CustomListener>> map) {
+        for (Map.Entry<MethodExecutor, Collection<CustomListener>> entry : map.entrySet()) {
+            for(CustomListener listener : entry.getValue()) {
+                try {
+                    entry.getKey().execute(listener, event);
+                } catch (EventException e) {
+                    System.out.println("Failed while calling event listener: " + entry.getValue().getClass());
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    private static Map<MethodExecutor, CustomListener> getMethodExecutorMap(CustomEvent event,
-                                                                            CustomListener... listeners) {
-        SortedMap<MethodExecutor, CustomListener> map = new TreeMap<>();
+    @SuppressWarnings("Duplicates")
+    private static Map<MethodExecutor, Collection<CustomListener>> getMethodExecutorMap(CustomEvent event,
+                                                                                        CustomListener... listeners) {
+        SortedMap<MethodExecutor, Collection<CustomListener>> map = new TreeMap<>();
 
         for (CustomListener listener : listeners) {
             if (listener == null) continue;
             for (MethodExecutor methodExecutor : getMethodExecutors(listener, event)) {
-                map.put(methodExecutor, listener);
+
+                Collection<CustomListener> group = map.get(methodExecutor);
+                if(group == null) {
+                    group = new ArrayList<>();
+                    map.put(methodExecutor, group);
+                }
+
+                group.add(listener);
             }
         }
 
@@ -56,9 +66,9 @@ public class CustomEventExecutor {
     }
 
     @SafeVarargs
-    private static Map<MethodExecutor, CustomListener> getMethodExecutorMap(CustomEvent event,
+    private static Map<MethodExecutor, Collection<CustomListener>> getMethodExecutorMap(CustomEvent event,
                                                                             Collection<CustomListener>... listeners) {
-        SortedMap<MethodExecutor, CustomListener> map = new TreeMap<>();
+        SortedMap<MethodExecutor, Collection<CustomListener>> map = new TreeMap<>();
 
         for (Collection<CustomListener> listenerGroup : listeners) {
             addToMethodExecutorMap(event, listenerGroup, map);
@@ -67,12 +77,20 @@ public class CustomEventExecutor {
         return map;
     }
 
+    @SuppressWarnings("Duplicates")
     private static void addToMethodExecutorMap(CustomEvent event, Iterable<CustomListener> listenerGroup,
-                                               SortedMap<MethodExecutor, CustomListener> map) {
+                                               SortedMap<MethodExecutor, Collection<CustomListener>> map) {
         for (CustomListener listener : listenerGroup) {
             if (listener == null) continue;
             for (MethodExecutor methodExecutor : getMethodExecutors(listener, event)) {
-                map.put(methodExecutor, listener);
+
+                Collection<CustomListener> group = map.get(methodExecutor);
+                if(group == null) {
+                    group = new ArrayList<>();
+                    map.put(methodExecutor, group);
+                }
+
+                group.add(listener);
             }
         }
     }
@@ -81,9 +99,9 @@ public class CustomEventExecutor {
         executeListeners(event, getMethodExecutorMap(event, listeners));
     }
 
-    private static Map<MethodExecutor, CustomListener> getMethodExecutorMap(CustomEvent event,
+    private static Map<MethodExecutor, Collection<CustomListener>> getMethodExecutorMap(CustomEvent event,
                                                                             Iterable<Collection<CustomListener>> listeners) {
-        SortedMap<MethodExecutor, CustomListener> map = new TreeMap<>();
+        SortedMap<MethodExecutor, Collection<CustomListener>> map = new TreeMap<>();
 
         for (Collection<CustomListener> listenerGroup : listeners) {
             addToMethodExecutorMap(event, listenerGroup, map);
