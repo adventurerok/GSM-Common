@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by paul on 09/03/16.
@@ -18,7 +19,7 @@ public class CommandInfo implements ConfigSerializable {
     protected final String description;
     protected final String permission;
     protected final List<String> aliases;
-    protected final Map<String, List<String>> tabCompletion = new HashMap<>();
+    protected final Map<Pattern, List<String>> tabCompletion = new HashMap<>();
 
     public CommandInfo(String name, Config config) {
         this.name = name;
@@ -34,7 +35,7 @@ public class CommandInfo implements ConfigSerializable {
 
             List<String> values = tabConfig.getStringList("values");
 
-            tabCompletion.put(pattern, values);
+            tabCompletion.put(Pattern.compile(pattern), values);
         }
     }
 
@@ -58,6 +59,10 @@ public class CommandInfo implements ConfigSerializable {
         return aliases;
     }
 
+    public Map<Pattern, List<String>> getTabCompletion() {
+        return tabCompletion;
+    }
+
     public Config toConfig() {
         Config result = new MemoryConfig();
 
@@ -69,10 +74,10 @@ public class CommandInfo implements ConfigSerializable {
 
         List<Config> tabConfigs = new ArrayList<>();
 
-        for(Map.Entry<String, List<String>> tabEntry : tabCompletion.entrySet()) {
+        for(Map.Entry<Pattern, List<String>> tabEntry : tabCompletion.entrySet()) {
             Config tabConfig = new MemoryConfig();
 
-            tabConfig.set("pattern", tabEntry.getKey());
+            tabConfig.set("pattern", tabEntry.getKey().toString());
             tabConfig.set("values", tabEntry.getValue());
 
             tabConfigs.add(tabConfig);
