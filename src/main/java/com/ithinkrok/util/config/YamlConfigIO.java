@@ -65,6 +65,8 @@ public class YamlConfigIO {
             throw new InvalidConfigException("Error while loading config", e);
         }
 
+        if(values == null) throw new InvalidConfigException("Yaml.load() produced null instead of a map");
+
         config.setAll(values);
 
         return config;
