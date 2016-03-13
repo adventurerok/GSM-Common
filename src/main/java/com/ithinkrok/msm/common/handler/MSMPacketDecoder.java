@@ -2,16 +2,13 @@ package com.ithinkrok.msm.common.handler;
 
 import com.ithinkrok.msm.common.Packet;
 import com.ithinkrok.util.config.BinaryConfigIO;
-import com.ithinkrok.util.config.BinaryConfigType;
 import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.config.MemoryConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.io.DataInput;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
