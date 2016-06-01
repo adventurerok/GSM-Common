@@ -1,6 +1,5 @@
 package com.ithinkrok.util.config;
 
-import com.ithinkrok.msm.common.util.ConfigUtils;
 import org.json.simple.JSONValue;
 
 import java.util.Map;

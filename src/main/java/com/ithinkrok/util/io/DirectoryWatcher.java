@@ -1,4 +1,4 @@
-package com.ithinkrok.msm.common.util.io;
+package com.ithinkrok.util.io;
 
 import java.io.IOException;
 import java.nio.file.*;

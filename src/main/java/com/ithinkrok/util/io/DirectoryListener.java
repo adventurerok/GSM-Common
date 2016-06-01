@@ -1,4 +1,4 @@
-package com.ithinkrok.msm.common.util.io;
+package com.ithinkrok.util.io;
 
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;

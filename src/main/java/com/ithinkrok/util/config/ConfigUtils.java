@@ -1,4 +1,4 @@
-package com.ithinkrok.msm.common.util;
+package com.ithinkrok.util.config;
 
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
