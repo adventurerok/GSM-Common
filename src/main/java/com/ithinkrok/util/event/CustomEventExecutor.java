@@ -20,7 +20,7 @@ public class CustomEventExecutor {
                 try {
                     entry.getKey().execute(listener, event);
                 } catch (EventException e) {
-                    System.out.println("Failed while calling event listener: " + entry.getValue().getClass());
+                    System.out.println("Failed while calling event listener: " + listener.getClass());
                     e.printStackTrace();
                 }
             }
