@@ -5,9 +5,19 @@ package com.ithinkrok.util.lang;
  */
 public interface Messagable {
 
-    void sendMessage(String message);
+    default void sendMessage(String message){
+        sendMessageNoPrefix(message);
+    }
+
     void sendMessageNoPrefix(String message);
-    void sendLocale(String locale, Object... args);
-    void sendLocaleNoPrefix(String locale, Object... args);
+
+    default void sendLocale(String locale, Object... args){
+        sendLocaleNoPrefix(locale, args);
+    }
+
+    default void sendLocaleNoPrefix(String locale, Object... args){
+        sendMessageNoPrefix(getLanguageLookup().getLocale(locale, args));
+    }
+
     LanguageLookup getLanguageLookup();
 }
