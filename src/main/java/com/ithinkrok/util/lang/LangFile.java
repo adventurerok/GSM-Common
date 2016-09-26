@@ -18,11 +18,13 @@ public class LangFile implements LanguageLookup {
     private final Map<Object, String> languageStrings = new HashMap<>();
 
     public LangFile(Path in) throws IOException {
-        this(Files.newInputStream(in));
+        try (InputStream stream = Files.newInputStream(in)) {
+            addFromProperties(loadProperties(stream));
+        }
     }
 
     public LangFile(InputStream in) throws IOException {
-        this(loadProperties(in));
+        addFromProperties(loadProperties(in));
     }
 
     private static Properties loadProperties(InputStream in) throws IOException {
@@ -33,6 +35,10 @@ public class LangFile implements LanguageLookup {
     }
 
     public LangFile(Properties properties) {
+        addFromProperties(properties);
+    }
+
+    private void addFromProperties(Properties properties) {
         for(Object key : properties.keySet()){
             String value = properties.getProperty(key.toString());
             value = value.replace('&', '§');
