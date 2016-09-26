@@ -21,7 +21,9 @@ public class BinaryConfigIO {
     }
 
     public static void saveConfig(Path path, Config config) throws IOException {
-        saveConfig(Files.newOutputStream(path), config);
+        try (OutputStream out = Files.newOutputStream(path)) {
+            saveConfig(out, config);
+        }
     }
 
     public static Config loadConfig(DataInput input) throws IOException {
@@ -33,7 +35,9 @@ public class BinaryConfigIO {
     }
 
     public static Config loadConfig(Path path) throws IOException {
-        return loadConfig(Files.newInputStream(path));
+        try (InputStream input = Files.newInputStream(path)) {
+            return loadConfig(input);
+        }
     }
 
     static Config readConfig(DataInput msg) throws IOException {
