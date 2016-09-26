@@ -27,7 +27,9 @@ public class YamlConfigIO {
     }
 
     public static Config loadToConfig(Path path, Config config) throws IOException {
-        return loadToConfig(Files.newBufferedReader(path), config);
+        try (BufferedReader input = Files.newBufferedReader(path)) {
+            return loadToConfig(input, config);
+        }
     }
 
     public static void saveConfig(Writer output, Config config) {
@@ -35,11 +37,14 @@ public class YamlConfigIO {
     }
 
     public static void saveConfig(OutputStream output, Config config) {
+        //Don't close as that is the caller's responsibility
         saveConfig(new OutputStreamWriter(output), config);
     }
 
     public static void saveConfig(Path path, Config config) throws IOException {
-        saveConfig(Files.newBufferedWriter(path), config);
+        try (BufferedWriter output = Files.newBufferedWriter(path)) {
+            saveConfig(output, config);
+        }
     }
 
     @SuppressWarnings("unchecked")
