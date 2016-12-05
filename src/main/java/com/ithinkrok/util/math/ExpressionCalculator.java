@@ -135,6 +135,9 @@ public class ExpressionCalculator implements Calculator {
         tokenizer.ordinaryChar('-');
         tokenizer.ordinaryChar('/');
         tokenizer.wordChars('_', '_');
+        tokenizer.wordChars('#', '#');
+        tokenizer.wordChars('@', '@');
+        tokenizer.wordChars('$', '$');
 
         List<String> tokBuf = new ArrayList<>();
         boolean valueLast = false;
