@@ -36,6 +36,13 @@ public class MemoryConfig implements Config {
         }
     }
 
+    /**
+     * Deep copy
+     */
+    public MemoryConfig(Config other) {
+        this(ConfigUtils.toMap(other), other.getSeparator());
+    }
+
     @SuppressWarnings("unchecked")
     private Object correctMapsToConfigs(Object obj) {
         //Replace maps with configs

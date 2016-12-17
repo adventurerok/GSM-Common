@@ -1,10 +1,9 @@
 package com.ithinkrok.util.config;
 
-import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.config.ConfigSerializable;
-import com.ithinkrok.util.config.MemoryConfig;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by paul on 01/01/16.
@@ -13,8 +12,8 @@ public class ConfigUtils {
 
     public static final Config EMPTY_CONFIG = new MemoryConfig();
 
-    public static Map<String, Object> toMap(Config config) {
-        Map<String, Object> result = new LinkedHashMap<>();
+    public static LinkedHashMap<String, Object> toMap(Config config) {
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>();
 
         for(String key : config.getKeys(false)) {
             Object obj = config.get(key);
