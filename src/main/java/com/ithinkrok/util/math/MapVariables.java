@@ -25,6 +25,12 @@ public class MapVariables implements Variables {
         }
     }
 
+    public MapVariables(MapVariables copy) {
+        this(new HashMap<>());
+
+        variables.putAll(copy.variables);
+    }
+
     public MapVariables(Map<String, Double> variables) {
         this.variables = variables;
     }
