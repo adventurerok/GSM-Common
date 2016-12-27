@@ -1,7 +1,5 @@
 package com.ithinkrok.util.math;
 
-import com.ithinkrok.util.math.Variables;
-
 /**
  * Created by paul on 03/01/16.
  *
