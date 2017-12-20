@@ -6,6 +6,9 @@ import com.ithinkrok.util.config.MemoryConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ithinkrok.msm.common.message.LogColor.FORMAT_KEY_VALUE_GROUP;
+import static com.ithinkrok.msm.common.message.LogColor.RESET_COLOR;
+
 /**
  * Created by paul on 06/02/16.
  * <p>
@@ -130,11 +133,7 @@ public class MinecraftClientInfo implements ClientInfo {
     @Override
     public String toString() {
         return "MinecraftClientInfo{" +
-                "subtype=" + subType +
-                ", name='" + name + '\'' +
-                ", hasBungee=" + hasBungee +
-                ", maxPlayerCount=" + maxPlayerCount +
-                ", plugins=" + plugins +
-                '}';
+                FORMAT_KEY_VALUE_GROUP(RESET_COLOR, "subtype", subType, "name", name, "hasBungee", hasBungee,
+                                       "maxPlayerCount", maxPlayerCount, "plugins", plugins) + "}";
     }
 }
