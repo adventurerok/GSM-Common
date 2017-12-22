@@ -145,11 +145,35 @@ public class ExpressionCalculator implements Calculator {
 
     private final Expression expression;
 
+    /**
+     * Creates an Expression from a String representation, using the default SimplifyMode as
+     * {@link SimplifyMode#DOUBLE}.
+     *
+     * This constructor is not suited for BigDecimal operation.
+     * If that is your desired use case, use {@link #ExpressionCalculator(String, SimplifyMode)} with either
+     * {@link SimplifyMode#NONE} for no simplification, or {@link SimplifyMode#decimal(MathContext)} to simplify to
+     * your desired precision.
+     *
+     * @param expression The expression to parse
+     * @throws ExpressionException If there is a problem with the expression.
+     */
     public ExpressionCalculator(String expression) {
         this(expression, SimplifyMode.DOUBLE);
     }
 
-    public ExpressionCalculator(String expression, SimplifyMode simplifyDouble) {
+    /**
+     * Creates an Expression from a String representation, using the default SimplifyMode as
+     * {@link SimplifyMode#DOUBLE}.
+     *
+     * This constructor is required for BigDecimal operation, due to the other constructor defaulting to
+     * {@link SimplifyMode#DOUBLE} for backwards compatibility when BigDecimal operation was not a thing.
+     *
+     * @param expression The expression to parse
+     * @param simplifyMode The SimplifyMode to use. This can convert Expressions into simplified forms.
+     *                     See {@link SimplifyMode}
+     * @throws ExpressionException If there is a problem with the expression.
+     */
+    public ExpressionCalculator(String expression, SimplifyMode simplifyMode) {
         List<String> tokens;
 
         try {
@@ -160,7 +184,7 @@ public class ExpressionCalculator implements Calculator {
 
         tokens = toPostfixNotation(tokens);
 
-        this.expression = parsePostfixNotation(tokens, simplifyDouble);
+        this.expression = parsePostfixNotation(tokens, simplifyMode);
     }
 
     private static List<String> tokenize(String s) throws IOException {
