@@ -2,6 +2,9 @@ package com.ithinkrok.util.math.expression;
 
 import com.ithinkrok.util.math.Variables;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 /**
  * Created by paul on 03/01/16.
  */
@@ -16,6 +19,11 @@ public class VariableExpression implements Expression {
     @Override
     public double calculate(Variables variables) {
         return variables != null ? variables.getVariable(variable) : 0;
+    }
+
+    @Override
+    public BigDecimal calculateDecimal(Variables variables, MathContext mc) {
+        return variables != null ? variables.getDecimalVariable(variable) : BigDecimal.ZERO;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.ithinkrok.util.math;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 /**
  * Created by paul on 03/01/16.
@@ -37,7 +38,7 @@ public interface Calculator {
      * @param variables The variables object to use for variables lookup
      * @return The BigDecimal result of the calculation
      */
-    default BigDecimal calculateDecimal(Variables variables) {
+    default BigDecimal calculateDecimal(Variables variables, MathContext mc) {
         return BigDecimal.valueOf(calculate(variables));
     }
 

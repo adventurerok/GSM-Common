@@ -2,20 +2,44 @@ package com.ithinkrok.util.math.expression;
 
 import com.ithinkrok.util.math.Variables;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 /**
  * Created by paul on 03/01/16.
  */
 public class NumberExpression implements Expression {
 
-    private final double number;
+    private BigDecimal decimalVal;
+    private final double doubleVal;
 
-    public NumberExpression(double number) {
-        this.number = number;
+
+    public NumberExpression(String value) {
+        this(new BigDecimal(value));
+    }
+
+    public NumberExpression(BigDecimal value) {
+        this.decimalVal = value;
+        this.doubleVal = this.decimalVal.doubleValue();
+    }
+
+    public NumberExpression(double value) {
+        this.doubleVal = value;
+        this.decimalVal = null;
     }
 
     @Override
     public double calculate(Variables variables) {
-        return number;
+        return doubleVal;
+    }
+
+    @Override
+    public BigDecimal calculateDecimal(Variables variables, MathContext mc) {
+        if(decimalVal == null) { //lazy evaluate for cases when BigDecimal mode is not used
+            decimalVal = BigDecimal.valueOf(doubleVal);
+        }
+
+        return decimalVal;
     }
 
     @Override
@@ -30,18 +54,16 @@ public class NumberExpression implements Expression {
 
         NumberExpression that = (NumberExpression) o;
 
-        return Double.compare(that.number, number) == 0;
-
+        return decimalVal.equals(that.decimalVal);
     }
 
     @Override
     public int hashCode() {
-        long temp = Double.doubleToLongBits(number);
-        return (int) (temp ^ (temp >>> 32));
+        return decimalVal.hashCode();
     }
 
     @Override
     public String toString() {
-        return Double.toString(number);
+        return decimalVal.toString();
     }
 }

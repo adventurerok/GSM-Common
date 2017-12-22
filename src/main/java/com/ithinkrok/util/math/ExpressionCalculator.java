@@ -5,6 +5,9 @@ import com.ithinkrok.util.math.expression.*;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -16,32 +19,31 @@ public class ExpressionCalculator implements Calculator {
 
     private static final Map<String, Operator> opMap = new HashMap<>();
 
-    public static boolean isOperatorOrFunction(String check) {
-        return opMap.containsKey(check);
-    }
-
-    public static void addOperator(String op, Operator.Executor executor, boolean isFunction, boolean isDynamic, int
-            precedence, int minArgs, int maxArgs) {
-        opMap.put(op, new Operator(op, executor, isFunction, isDynamic, precedence, minArgs, maxArgs));
-    }
-
-    private static int integer(double d) {
-        return (int)Math.floor(d);
-    }
-
     static {
-        addOperator("/", numbers -> numbers[0] / numbers[1], false, false, 20, 2, 2);
-        addOperator("*", numbers -> numbers[0] * numbers[1], false, false, 20, 2, 2);
-        addOperator("%", numbers -> numbers[0] % numbers[1], false, false, 20, 2, 2);
-        addOperator("+", numbers -> numbers[0] + numbers[1], false, false, 30, 2, 2);
-        addOperator("-", numbers -> numbers[0] - numbers[1], false, false, 30, 2, 2);
+        addOperator("/", numbers -> numbers[0] / numbers[1], (mc, numbers) -> numbers[0].divide(numbers[1], mc),
+                    false, false, 20, 2, 2);
+        addOperator("*", numbers -> numbers[0] * numbers[1], (mc, numbers) -> numbers[0].multiply(numbers[1], mc),
+                    false, false, 20, 2, 2);
+        addOperator("%", numbers -> numbers[0] % numbers[1], (mc, numbers) -> numbers[0].remainder(numbers[1], mc),
+                    false, false, 20, 2, 2);
+        addOperator("+", numbers -> numbers[0] + numbers[1], (mc, numbers) -> numbers[0].add(numbers[1], mc),
+                    false, false, 30, 2, 2);
+        addOperator("-", numbers -> numbers[0] - numbers[1], (mc, numbers) -> numbers[0].subtract(numbers[1], mc),
+                    false, false, 30, 2, 2);
 
-        addOperator("=", numbers -> (numbers[0] == numbers[1]) ? 1 : 0, false, false, 35, 2, 2);
-        addOperator("<", numbers -> (numbers[0] < numbers[1]) ? 1 : 0, false, false, 35, 2, 2);
-        addOperator(">", numbers -> (numbers[0] > numbers[1]) ? 1 : 0, false, false, 35, 2, 2);
+        addOperator("=", numbers -> (numbers[0] == numbers[1]) ? 1 : 0,
+                    (mc, numbers) -> numbers[0].equals(numbers[1]) ? BigDecimal.ONE : BigDecimal.ZERO,
+                    false, false, 35, 2, 2);
+        addOperator("<", numbers -> (numbers[0] < numbers[1]) ? 1 : 0,
+                    (mc, numbers) -> (numbers[0].compareTo(numbers[1]) < 0) ? BigDecimal.ONE : BigDecimal.ZERO,
+                    false, false, 35, 2, 2);
+        addOperator(">", numbers -> (numbers[0] > numbers[1]) ? 1 : 0,
+                    (mc, numbers) -> (numbers[0].compareTo(numbers[1]) > 0) ? BigDecimal.ONE : BigDecimal.ZERO,
+                    false, false, 35, 2, 2);
 
         //unary minus = '
-        addOperator("'", numbers -> -numbers[0], false, false, 5, 1, 1);
+        addOperator("'", numbers -> -numbers[0], (mc, numbers) -> numbers[0].negate(mc),
+                    false, false, 5, 1, 1);
 
         addOperator("|", numbers -> integer(numbers[0]) | integer(numbers[1]), false, false, 40, 2, 2);
         addOperator("&", numbers -> integer(numbers[0]) & integer(numbers[1]), false, false, 40, 2, 2);
@@ -62,7 +64,16 @@ public class ExpressionCalculator implements Calculator {
         addOperator("degrees", numbers -> Math.toDegrees(numbers[0]), true, false, 0, 1, 1);
         addOperator("radians", numbers -> Math.toRadians(numbers[0]), true, false, 0, 1, 1);
 
-        addOperator("pow", numbers -> Math.pow(numbers[0], numbers[1]), true, false, 0, 2, 2);
+        addOperator("pow", numbers -> Math.pow(numbers[0], numbers[1]), (mc, numbers) -> {
+                        try {
+                            int power = numbers[1].intValueExact();
+
+                            return numbers[0].pow(power, mc);
+                        } catch (ArithmeticException ignored) {
+                            return BigDecimal.valueOf(Math.pow(numbers[0].doubleValue(), numbers[1].doubleValue()));
+                        }
+                    },
+                    true, false, 0, 2, 2);
         addOperator("sqrt", numbers -> Math.sqrt(numbers[0]), true, false, 0, 1, 1);
         addOperator("ln", numbers -> Math.log(numbers[0]), true, false, 0, 1, 1);
         addOperator("lg", numbers -> Math.log(numbers[0]) * 1.44269504089, true, false, 0, 1, 1);
@@ -72,61 +83,84 @@ public class ExpressionCalculator implements Calculator {
         addOperator("random", numbers -> random.nextDouble(), true, true, 0, 0, 0);
         addOperator("ranInt", numbers -> random.nextInt((int) numbers[0]), true, true, 0, 1, 1);
 
-        addOperator("round", numbers -> Math.round(numbers[0]), true, false, 0, 1, 1);
-        addOperator("abs", numbers -> Math.abs(numbers[0]), true, false, 0, 1, 1);
-        addOperator("floor", numbers -> Math.floor(numbers[0]), true, false, 0, 1, 1);
-        addOperator("ceil", numbers -> Math.ceil(numbers[0]), true, false, 0, 1, 1);
+        addOperator("round", numbers -> Math.round(numbers[0]),
+                    (mc, numbers) -> numbers[0].setScale(0, RoundingMode.HALF_UP),
+                    true, false, 0, 1, 1);
+        addOperator("abs", numbers -> Math.abs(numbers[0]), (mc, numbers) -> numbers[0].abs(mc),
+                    true, false, 0, 1, 1);
+        addOperator("floor", numbers -> Math.floor(numbers[0]),
+                    (mc, numbers) -> numbers[0].setScale(0, RoundingMode.FLOOR),
+                    true, false, 0, 1, 1);
+        addOperator("ceil", numbers -> Math.ceil(numbers[0]),
+                    (mc, numbers) -> numbers[0].setScale(0, RoundingMode.CEILING),
+                    true, false, 0, 1, 1);
         addOperator("expression", numbers -> numbers[0], true, false, 0, 1, 1);
 
         addOperator("min", numbers -> {
             double min = Double.POSITIVE_INFINITY;
 
-            for(double num : numbers){
-                if(num < min) min = num;
+            for (double num : numbers) {
+                if (num < min) min = num;
+            }
+
+            return min;
+        }, (mc, numbers) -> {
+            BigDecimal min = numbers[0];
+
+            for (BigDecimal number : numbers) {
+                if(number.compareTo(min) < 0) {
+                    min = number;
+                }
             }
 
             return min;
         }, true, false, 0, 1, Integer.MAX_VALUE);
 
         addOperator("max", numbers -> {
-            double min = Double.NEGATIVE_INFINITY;
+            double max = Double.NEGATIVE_INFINITY;
 
-            for(double num : numbers){
-                if(num > min) min = num;
+            for (double num : numbers) {
+                if (num > max) max = num;
             }
 
-            return min;
-        }, true, false, 0, 1, Integer.MAX_VALUE);
+            return max;
+        }, (mc, numbers) -> {
+            BigDecimal max = numbers[0];
 
-        addOperator("array", numbers ->  {
+            for (BigDecimal num : numbers) {
+                if (num.compareTo(max) > 0) max = num;
+            }
+
+            return max;
+        },true, false, 0, 1, Integer.MAX_VALUE);
+
+        addOperator("array", numbers -> {
             int index = (int) (numbers[0] + 1);
+            return numbers[index];
+        }, (mc, numbers) -> {
+            int index = numbers[0].intValue() + 1;
             return numbers[index];
         }, true, false, 0, 2, Integer.MAX_VALUE);
     }
 
-    private Expression expression;
+    private final Expression expression;
 
     public ExpressionCalculator(String expression) {
-        this(expression, true);
+        this(expression, SimplifyMode.DOUBLE);
     }
 
-    public ExpressionCalculator(String expression, boolean simplify) {
+    public ExpressionCalculator(String expression, SimplifyMode simplifyDouble) {
         List<String> tokens;
 
         try {
             tokens = tokenize(expression);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to tokenize expression: " + expression, e);
+            throw new ExpressionException("Failed to tokenize expression: " + expression, e);
         }
 
         tokens = toPostfixNotation(tokens);
 
-        this.expression = parsePostfixNotation(tokens, simplify);
-    }
-
-    @Override
-    public String toString() {
-        return expression.toString();
+        this.expression = parsePostfixNotation(tokens, simplifyDouble);
     }
 
     private static List<String> tokenize(String s) throws IOException {
@@ -155,7 +189,7 @@ public class ExpressionCalculator implements Calculator {
 
                     boolean operator = opMap.containsKey(token) || "(".equals(token) || ",".equals(token);
 
-                    if(!"-".equals(token) || valueLast) tokBuf.add(token);
+                    if (!"-".equals(token) || valueLast) tokBuf.add(token);
                     else tokBuf.add("'"); //Unary minus
                     valueLast = !operator;
             }
@@ -171,17 +205,17 @@ public class ExpressionCalculator implements Calculator {
         for (String token : tokens) {
             Operator operator = opMap.get(token);
             if (operator != null) {
-                while (tokenStack.size() > 0 && lowerPrecedence(operator.getPrecedence(), tokenStack.getLast())) {
+                while (!tokenStack.isEmpty() && lowerPrecedence(operator.getPrecedence(), tokenStack.getLast())) {
                     output.add(tokenStack.removeLast());
                 }
                 tokenStack.add(token);
             } else if (isNumber(token)) {
                 output.add(token);
             } else if ("(".equals(token)) {
-                if (tokenStack.size() > 0 && opMap.containsKey(tokenStack.getLast()) &&
-                        opMap.get(tokenStack.getLast()).isFunction()) output.add(token);
+                if (!tokenStack.isEmpty() && opMap.containsKey(tokenStack.getLast()) &&
+                    opMap.get(tokenStack.getLast()).isFunction()) output.add(token);
                 tokenStack.add(token);
-            } else if(",".equals(token)){
+            } else if (",".equals(token)) {
                 while (!"(".equals(tokenStack.getLast())) {
                     output.add(tokenStack.removeLast());
                 }
@@ -191,15 +225,15 @@ public class ExpressionCalculator implements Calculator {
                 }
                 tokenStack.removeLast();
 
-                if (tokenStack.size() > 0 && opMap.containsKey(tokenStack.getLast()) &&
-                        opMap.get(tokenStack.getLast()).isFunction()) output.add(tokenStack.removeLast());
+                if (!tokenStack.isEmpty() && opMap.containsKey(tokenStack.getLast()) &&
+                    opMap.get(tokenStack.getLast()).isFunction()) output.add(tokenStack.removeLast());
             } else output.add(token);
         }
 
 
-        while (tokenStack.size() > 0) {
+        while (!tokenStack.isEmpty()) {
             String token = tokenStack.removeLast();
-            if ("(".equals(token)) throw new RuntimeException("Mismatched brackets: " + tokens);
+            if ("(".equals(token)) throw new ExpressionException("Mismatched brackets: " + tokens);
             output.add(token);
         }
 
@@ -207,16 +241,17 @@ public class ExpressionCalculator implements Calculator {
         return output;
     }
 
-    private static Expression parsePostfixNotation(List<String> tokens, boolean simplify) {
+    private static Expression parsePostfixNotation(List<String> tokens, SimplifyMode simplify) {
         LinkedList<Expression> stack = new LinkedList<>();
 
         for (String token : tokens) {
-            if ("(".equals(token)) stack.add(null); //Use a null expression as the stack separator
-            else if (isNumber(token)) stack.add(new NumberExpression(Double.parseDouble(token)));
-            else if (!opMap.containsKey(token)){
+            if ("(".equals(token)) {
+                stack.add(null); //Use a null expression as the stack separator
+            } else if (isNumber(token)) {
+                stack.add(new NumberExpression(token));
+            } else if (!opMap.containsKey(token)) {
                 stack.add(variableExpression(token));
-            }
-            else {
+            } else {
                 Operator op = opMap.get(token);
 
                 LinkedList<Expression> expressions = new LinkedList<>();
@@ -230,9 +265,9 @@ public class ExpressionCalculator implements Calculator {
                     expressions.addFirst(expr);
                 }
 
-                if (count > op.getMaxArguments()) throw new RuntimeException("Too many arguments for function" + token);
+                if (count > op.getMaxArguments()) throw new ExpressionException("Too many arguments for function" + token);
                 else if (count < op.getMinArguments())
-                    throw new RuntimeException("Too few arguments for function: " + token);
+                    throw new ExpressionException("Too few arguments for function: " + token);
 
                 stack.add(new OperatorExpression(op, op.isDynamic(), simplify, expressions));
             }
@@ -241,12 +276,75 @@ public class ExpressionCalculator implements Calculator {
         //noinspection StatementWithEmptyBody
         while (stack.remove(null)) ; //Remove all null elements from the stack
 
-        if (stack.size() != 1) throw new RuntimeException("Bad expression: " + tokens);
+        if (stack.size() != 1) throw new ExpressionException("Bad expression: " + tokens);
 
 
         Expression expression = stack.getFirst();
-        if (simplify && expression.isStatic()) expression = new NumberExpression(expression.calculate(null));
+        expression = simplify.simplify(expression);
+
         return expression;
+    }
+
+    private static boolean lowerPrecedence(int o1Index, String o2) {
+        Operator o2Info = opMap.get(o2);
+
+        if (o2Info == null) return false;
+
+        return o1Index >= o2Info.getPrecedence();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static boolean isNumber(String token) {
+        try {
+            Double.parseDouble(token);
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
+    }
+
+    private static Expression variableExpression(String token) {
+        switch (token.toLowerCase()) {
+            case "pi":
+                return new NumberExpression(Math.PI);
+            case "tau":
+                return new NumberExpression(Math.PI * 2);
+            case "e":
+                return new NumberExpression(Math.E);
+            case "true":
+                return new NumberExpression(BigDecimal.ONE);
+            case "false":
+                return new NumberExpression(BigDecimal.ZERO);
+            default:
+                return new VariableExpression(token);
+        }
+    }
+
+    public static boolean isOperatorOrFunction(String check) {
+        return opMap.containsKey(check);
+    }
+
+    public static void addOperator(String op,
+                                   Operator.Executor executor,
+                                   boolean isFunction, boolean isDynamic,
+                                   int precedence, int minArgs, int maxArgs) {
+        opMap.put(op, new Operator(op, executor, isFunction, isDynamic, precedence, minArgs, maxArgs));
+    }
+
+    public static void addOperator(String op,
+                                   Operator.Executor executor, Operator.DecimalExecutor decimalExecutor,
+                                   boolean isFunction, boolean isDynamic,
+                                   int precedence, int minArgs, int maxArgs) {
+        opMap.put(op, new Operator(op, executor, decimalExecutor, isFunction, isDynamic, precedence, minArgs, maxArgs));
+    }
+
+    private static int integer(double d) {
+        return (int) Math.floor(d);
+    }
+
+    @Override
+    public int hashCode() {
+        return expression.hashCode();
     }
 
     @Override
@@ -261,43 +359,8 @@ public class ExpressionCalculator implements Calculator {
     }
 
     @Override
-    public int hashCode() {
-        return expression.hashCode();
-    }
-
-    private static Expression variableExpression(String token) {
-        switch(token.toLowerCase()) {
-            case "pi":
-                return new NumberExpression(Math.PI);
-            case "tau":
-                return new NumberExpression(Math.PI * 2);
-            case "e":
-                return new NumberExpression(Math.E);
-            case "true":
-                return new NumberExpression(1);
-            case "false":
-                return new NumberExpression(0);
-            default:
-                return new VariableExpression(token);
-        }
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean isNumber(String token) {
-        try {
-            Double.parseDouble(token);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private static boolean lowerPrecedence(int o1Index, String o2) {
-        Operator o2Info = opMap.get(o2);
-
-        if (o2Info == null) return false;
-
-        return o1Index >= o2Info.getPrecedence();
+    public String toString() {
+        return expression.toString();
     }
 
     @Override
