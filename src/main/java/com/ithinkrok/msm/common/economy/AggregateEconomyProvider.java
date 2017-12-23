@@ -66,25 +66,12 @@ public class AggregateEconomyProvider implements EconomyProvider {
         subProviders.get(currency).getBalance(uuid, currency, consumer);
     }
 
-    @Override
-    public Optional<TransactionResult> deposit(UUID uuid, Currency currency, BigDecimal amount) {
-        currencyCheck(currency);
-
-        return subProviders.get(currency).deposit(uuid, currency, amount);
-    }
 
     @Override
     public void deposit(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
         currencyCheck(currency);
 
         subProviders.get(currency).deposit(uuid, currency, amount, consumer);
-    }
-
-    @Override
-    public Optional<TransactionResult> withdraw(UUID uuid, Currency currency, BigDecimal amount) {
-        currencyCheck(currency);
-
-        return subProviders.get(currency).withdraw(uuid, currency, amount);
     }
 
     @Override
@@ -95,26 +82,12 @@ public class AggregateEconomyProvider implements EconomyProvider {
     }
 
     @Override
-    public Optional<TransactionResult> transfer(UUID from, UUID to, Currency currency, BigDecimal amount) {
-        currencyCheck(currency);
-
-        return subProviders.get(currency).transfer(from, to, currency, amount);
-    }
-
-    @Override
     public void transfer(UUID from, UUID to, Currency currency, BigDecimal amount,
                          Consumer<TransactionResult> consumer) {
 
         currencyCheck(currency);
 
         subProviders.get(currency).transfer(from, to, currency, amount, consumer);
-    }
-
-    @Override
-    public Optional<TransactionResult> setBalance(UUID uuid, Currency currency, BigDecimal amount) {
-        currencyCheck(currency);
-
-        return subProviders.get(currency).setBalance(uuid, currency, amount);
     }
 
     @Override

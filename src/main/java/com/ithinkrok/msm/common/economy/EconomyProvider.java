@@ -43,46 +43,36 @@ public interface EconomyProvider {
      */
     Optional<BigDecimal> getBalance(UUID uuid, Currency currency);
 
-    default void deposit(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
-        consumer.accept(deposit(uuid, currency, amount).get());
-    }
+    /**
+     * Deposits the amount into the account of the given UUID and currency.
+     */
+    void deposit(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
 
     /**
-     * Deposits an amount into an account.
-     * Will not do anything if blocking would be required.
+     * Withdraws amount from the account of the given UUID and currency.
+     *
+     * If insufficient funds are available in the account,
+     * the consumer will be called with {@link TransactionResult#NO_FUNDS}.
+     * There is no guarantee the account will have the required funds even after a call to getBalance.
      */
-    Optional<TransactionResult> deposit(UUID uuid, Currency currency, BigDecimal amount);
-
-    default void withdraw(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
-        consumer.accept(withdraw(uuid, currency, amount).get());
-    }
+    void withdraw(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
 
     /**
-     * Withdraws an amount from an account.
-     * Will not do anything if blocking would be required.
+     * Transfers money between from and to. This may run the consumer code on any thread that it wants.
+     *
+     * @param from UUID to transfer money from
+     * @param to UUID to transfer money to
+     * @param currency Currency to transfer
+     * @param amount Amount to transfer
+     * @param consumer Consumer to send the result to
      */
-    Optional<TransactionResult> withdraw(UUID uuid, Currency currency, BigDecimal amount);
-
-    default void transfer(UUID from, UUID to, Currency currency, BigDecimal amount,
-                          Consumer<TransactionResult> consumer) {
-        consumer.accept(transfer(from, to, currency, amount).get());
-    }
+    void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
 
     /**
-     * Transfers some balance between two accounts.
-     * Will not do anything if blocking would be required.
+     * Sets the balance of the account for the given UUID and currency. Consumer code may be run on any thread.
      */
-    Optional<TransactionResult> transfer(UUID from, UUID to, Currency currency, BigDecimal amount);
+    void setBalance(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
 
-    default void setBalance(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
-        consumer.accept(setBalance(uuid, currency, amount).get());
-    }
-
-    /**
-     * Sets the balance of an account.
-     * Will not do anything if blocking would be required.
-     */
-    Optional<TransactionResult> setBalance(UUID uuid, Currency currency, BigDecimal amount);
 
 
     /**
