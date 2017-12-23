@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface Currency {
 
-    CurrencyType getCurrencyType();
+    String getCurrencyType();
 
     String format(BigDecimal amount);
 
@@ -17,4 +17,15 @@ public interface Currency {
     String getPluralFormattedName();
 
     String getSymbol();
+
+    /**
+     * @return The context for this currency. A (name,context) make up a unique currency.
+     */
+    CurrencyContext getCurrencyContext();
+
+    /**
+     * @return If it is valid to use this currency at this point.
+     *         Once this becomes false it should never become true again.
+     */
+    boolean isValid();
 }
