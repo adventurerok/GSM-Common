@@ -12,9 +12,12 @@ public interface Currency {
 
     String getName();
 
+    /**
+     * @return The plural formatted name of the currency
+     */
     String getFormattedName();
 
-    String getPluralFormattedName();
+    String getSigularFormattedName();
 
     String getSymbol();
 
