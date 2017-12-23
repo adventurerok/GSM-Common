@@ -17,7 +17,7 @@ public interface Currency {
      */
     String getFormattedName();
 
-    String getSigularFormattedName();
+    String getSingularFormattedName();
 
     String getSymbol();
 
