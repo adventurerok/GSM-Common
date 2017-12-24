@@ -1,7 +1,9 @@
 package com.ithinkrok.msm.common.economy.provider;
 
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
+import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
 import com.ithinkrok.msm.common.economy.result.TransferResult;
 
 import java.math.BigDecimal;
@@ -43,13 +45,18 @@ public abstract class DecoratorEconomyProvider implements EconomyProvider {
     }
 
     @Override
-    public void getBalance(UUID uuid, Currency currency, Consumer<BigDecimal> consumer) {
+    public void getBalance(UUID uuid, Currency currency, Consumer<Balance> consumer) {
         decorating.getBalance(uuid, currency, consumer);
     }
 
     @Override
-    public Optional<BigDecimal> getBalance(UUID uuid, Currency currency) {
+    public Optional<Balance> getBalance(UUID uuid, Currency currency) {
         return decorating.getBalance(uuid, currency);
+    }
+
+    @Override
+    public void getBalances(Set<UUID> uuids, Set<Currency> currencies, Consumer<MultiBalanceResult> consumer) {
+        decorating.getBalances(uuids, currencies, consumer);
     }
 
     @Override

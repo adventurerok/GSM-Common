@@ -1,11 +1,10 @@
 package com.ithinkrok.msm.common.economy.provider;
 
 import com.ithinkrok.msm.common.economy.Currency;
-import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
-import com.ithinkrok.msm.common.economy.result.TransactionResult;
-import com.ithinkrok.msm.common.economy.result.TransferResult;
+import com.ithinkrok.msm.common.economy.result.*;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -42,15 +41,24 @@ public interface EconomyProvider {
      */
     Optional<Boolean> hasAccount(UUID uuid, Currency currency);
 
-    default void getBalance(UUID uuid, Currency currency, Consumer<BigDecimal> consumer) {
+    default void getBalance(UUID uuid, Currency currency, Consumer<Balance> consumer) {
         consumer.accept(getBalance(uuid, currency).get());
     }
+
+
+    /**
+     * Attempts to get the balances of the specified UUIDs for the specified currencies.
+     *
+     * Will call the Consumer once all or some of the balances have been found, and may keep calling it.
+     * The MultiBalanceResult will indicate whether there are more events coming or not.
+     */
+    void getBalances(Set<UUID> uuids, Set<Currency> currencies, Consumer<MultiBalanceResult> consumer);
 
     /**
      * @return The balance of the specified UUID in the currency, 0 if they have none, or
      * {@link Optional#EMPTY} if this check would require blocking.
      */
-    Optional<BigDecimal> getBalance(UUID uuid, Currency currency);
+    Optional<Balance> getBalance(UUID uuid, Currency currency);
 
     /**
      * Deposits the amount into the account of the given UUID and currency.
