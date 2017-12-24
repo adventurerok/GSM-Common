@@ -1,5 +1,6 @@
-package com.ithinkrok.msm.common.economy;
+package com.ithinkrok.msm.common.economy.provider;
 
+import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.TransactionResult;
 import com.ithinkrok.msm.common.economy.result.TransferResult;

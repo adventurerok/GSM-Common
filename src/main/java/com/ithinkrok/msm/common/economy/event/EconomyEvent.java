@@ -1,7 +1,7 @@
 package com.ithinkrok.msm.common.economy.event;
 
 import com.ithinkrok.msm.common.economy.Currency;
-import com.ithinkrok.msm.common.economy.EconomyProvider;
+import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.event.CustomEvent;
 
 public interface EconomyEvent extends CustomEvent {

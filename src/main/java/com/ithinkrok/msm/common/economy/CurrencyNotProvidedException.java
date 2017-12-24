@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common.economy;
 
+import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
+
 public class CurrencyNotProvidedException extends EconomyException {
 
     private final EconomyProvider provider;
