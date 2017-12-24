@@ -2,29 +2,31 @@ package com.ithinkrok.msm.common.economy.result;
 
 public class TransferResult {
 
+    public static final TransferResult FAILURE = new TransferResult(TransactionResult.FAILURE, null, null);
+
     private final TransactionResult transactionResult;
     private final BalanceChange sendingBalanceChange;
     private final BalanceChange receivingBalanceChange;
 
-    public TransferResult(TransactionResult transactionResult,
-                          BalanceChange sendingBalanceChange,
-                          BalanceChange receivingBalanceChange) {
+    public TransferResult(TransactionResult transResult,
+                          BalanceChange sendingChange,
+                          BalanceChange receivingChange) {
 
-        if(transactionResult == null) {
-            throw new NullPointerException("transactionResult cannot be null");
+        if (transResult == null) {
+            throw new NullPointerException("transResult cannot be null");
         }
 
-        if(sendingBalanceChange == null) {
-            throw new NullPointerException("sendingBalanceChange cannot be null");
+        if (transResult != TransactionResult.FAILURE && sendingChange == null) {
+            throw new IllegalArgumentException("sendingChange cannot be null unless transResult is FAILURE");
         }
 
-        if(receivingBalanceChange == null) {
-            throw new NullPointerException("receivingBalanceChange cannot be null");
+        if (transResult != TransactionResult.FAILURE && receivingChange == null) {
+            throw new IllegalArgumentException("receivingChange cannot be null unless transResult is FAILURE");
         }
 
-        this.transactionResult = transactionResult;
-        this.sendingBalanceChange = sendingBalanceChange;
-        this.receivingBalanceChange = receivingBalanceChange;
+        this.transactionResult = transResult;
+        this.sendingBalanceChange = sendingChange;
+        this.receivingBalanceChange = receivingChange;
     }
 
     public TransactionResult getTransactionResult() {
