@@ -15,6 +15,10 @@ public interface EconomyProvider {
 
 
     /**
+     * Gets a collection of Currencies that have their accounts managed by this provider.
+     * While all Currencies returned must be managed by this provider,
+     * there may be currencies not in this Collection that may work with this provider.
+     *
      * @return A collection of Currencies that this EconomyProvider manages.
      */
     Set<Currency> getManagedCurrencies();
