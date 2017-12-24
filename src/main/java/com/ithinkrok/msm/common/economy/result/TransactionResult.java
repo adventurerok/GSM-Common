@@ -1,4 +1,4 @@
-package com.ithinkrok.msm.common.economy;
+package com.ithinkrok.msm.common.economy.result;
 
 public enum TransactionResult {
 

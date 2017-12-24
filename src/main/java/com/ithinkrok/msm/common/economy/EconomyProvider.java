@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common.economy;
 
+import com.ithinkrok.msm.common.economy.result.TransactionResult;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;

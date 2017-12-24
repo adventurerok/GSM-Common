@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common.economy.event;
 
+import com.ithinkrok.msm.common.economy.result.BalanceChange;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -9,12 +11,9 @@ import java.util.UUID;
 public interface EconomyTransferEvent extends EconomyEvent {
 
 
-    UUID getSendingAccount();
+    BalanceChange getSendingBalanceChange();
 
 
-    UUID getRecievingAccount();
-
-
-    BigDecimal getAmount();
+    BalanceChange getRecievingBalanceChange();
 
 }
