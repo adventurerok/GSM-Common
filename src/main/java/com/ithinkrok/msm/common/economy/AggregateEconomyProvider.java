@@ -1,6 +1,8 @@
 package com.ithinkrok.msm.common.economy;
 
+import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.TransactionResult;
+import com.ithinkrok.msm.common.economy.result.TransferResult;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -71,7 +73,7 @@ public class AggregateEconomyProvider implements EconomyProvider {
 
     @Override
     public void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                        Consumer<TransactionResult> consumer) {
+                        Consumer<BalanceUpdateResult> consumer) {
         currencyCheck(currency);
 
         subProviders.get(currency).deposit(uuid, currency, amount, reason, consumer);
@@ -79,7 +81,7 @@ public class AggregateEconomyProvider implements EconomyProvider {
 
     @Override
     public void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                         Consumer<TransactionResult> consumer) {
+                         Consumer<BalanceUpdateResult> consumer) {
         currencyCheck(currency);
 
         subProviders.get(currency).withdraw(uuid, currency, amount, reason, consumer);
@@ -87,7 +89,7 @@ public class AggregateEconomyProvider implements EconomyProvider {
 
     @Override
     public void transfer(UUID from, UUID to, Currency currency, BigDecimal amount,
-                         String reason, Consumer<TransactionResult> consumer) {
+                         String reason, Consumer<TransferResult> consumer) {
 
         currencyCheck(currency);
 
@@ -96,7 +98,7 @@ public class AggregateEconomyProvider implements EconomyProvider {
 
     @Override
     public void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                           Consumer<TransactionResult> consumer) {
+                           Consumer<BalanceUpdateResult> consumer) {
         currencyCheck(currency);
 
         subProviders.get(currency).setBalance(uuid, currency, amount, reason, consumer);

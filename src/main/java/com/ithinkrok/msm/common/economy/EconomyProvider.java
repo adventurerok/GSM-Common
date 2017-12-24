@@ -1,6 +1,8 @@
 package com.ithinkrok.msm.common.economy;
 
+import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.TransactionResult;
+import com.ithinkrok.msm.common.economy.result.TransferResult;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -49,7 +51,7 @@ public interface EconomyProvider {
      * Deposits the amount into the account of the given UUID and currency.
      */
     void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                 Consumer<TransactionResult> consumer);
+                 Consumer<BalanceUpdateResult> consumer);
 
     /**
      * Withdraws amount from the account of the given UUID and currency.
@@ -59,7 +61,7 @@ public interface EconomyProvider {
      * There is no guarantee the account will have the required funds even after a call to getBalance.
      */
     void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                  Consumer<TransactionResult> consumer);
+                  Consumer<BalanceUpdateResult> consumer);
 
     /**
      * Transfers money between from and to. This may run the consumer code on any thread that it wants.
@@ -71,13 +73,13 @@ public interface EconomyProvider {
      * @param consumer Consumer to send the result to
      */
     void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, String reason,
-                  Consumer<TransactionResult> consumer);
+                  Consumer<TransferResult> consumer);
 
     /**
      * Sets the balance of the account for the given UUID and currency. Consumer code may be run on any thread.
      */
     void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                    Consumer<TransactionResult> consumer);
+                    Consumer<BalanceUpdateResult> consumer);
 
 
 

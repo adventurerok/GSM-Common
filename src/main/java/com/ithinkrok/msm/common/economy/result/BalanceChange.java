@@ -5,7 +5,7 @@ import com.ithinkrok.msm.common.economy.Currency;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class BalanceChange {
+public final class BalanceChange {
 
     private final UUID account;
     private final Currency currency;
@@ -14,7 +14,7 @@ public class BalanceChange {
     private final BigDecimal change;
     private final String reason;
 
-    public BalanceChange(UUID account, Currency currency, BigDecimal oldBalance, BigDecimal newBalance,
+    private BalanceChange(UUID account, Currency currency, BigDecimal oldBalance, BigDecimal newBalance,
                          BigDecimal change, String reason) {
         this.account = account;
         this.currency = currency;
@@ -40,6 +40,10 @@ public class BalanceChange {
                                                  BigDecimal oldBalance, BigDecimal change,
                                                  String reason) {
         return new BalanceChange(account, currency, oldBalance, oldBalance.add(change), change, reason);
+    }
+
+    public static BalanceChange noBalanceChange(UUID account, Currency currency, BigDecimal balance, String reason) {
+        return new BalanceChange(account, currency, balance, balance, BigDecimal.ZERO, reason);
     }
 
     public UUID getAccount() {
