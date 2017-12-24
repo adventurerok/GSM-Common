@@ -46,7 +46,8 @@ public interface EconomyProvider {
     /**
      * Deposits the amount into the account of the given UUID and currency.
      */
-    void deposit(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
+    void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                 Consumer<TransactionResult> consumer);
 
     /**
      * Withdraws amount from the account of the given UUID and currency.
@@ -55,23 +56,26 @@ public interface EconomyProvider {
      * the consumer will be called with {@link TransactionResult#NO_FUNDS}.
      * There is no guarantee the account will have the required funds even after a call to getBalance.
      */
-    void withdraw(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
+    void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                  Consumer<TransactionResult> consumer);
 
     /**
      * Transfers money between from and to. This may run the consumer code on any thread that it wants.
-     *
-     * @param from UUID to transfer money from
+     *  @param from UUID to transfer money from
      * @param to UUID to transfer money to
      * @param currency Currency to transfer
      * @param amount Amount to transfer
+     * @param reason
      * @param consumer Consumer to send the result to
      */
-    void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
+    void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, String reason,
+                  Consumer<TransactionResult> consumer);
 
     /**
      * Sets the balance of the account for the given UUID and currency. Consumer code may be run on any thread.
      */
-    void setBalance(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer);
+    void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                    Consumer<TransactionResult> consumer);
 
 
 

@@ -68,33 +68,36 @@ public class AggregateEconomyProvider implements EconomyProvider {
 
 
     @Override
-    public void deposit(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
+    public void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                        Consumer<TransactionResult> consumer) {
         currencyCheck(currency);
 
-        subProviders.get(currency).deposit(uuid, currency, amount, consumer);
+        subProviders.get(currency).deposit(uuid, currency, amount, reason, consumer);
     }
 
     @Override
-    public void withdraw(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
+    public void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                         Consumer<TransactionResult> consumer) {
         currencyCheck(currency);
 
-        subProviders.get(currency).withdraw(uuid, currency, amount, consumer);
+        subProviders.get(currency).withdraw(uuid, currency, amount, reason, consumer);
     }
 
     @Override
     public void transfer(UUID from, UUID to, Currency currency, BigDecimal amount,
-                         Consumer<TransactionResult> consumer) {
+                         String reason, Consumer<TransactionResult> consumer) {
 
         currencyCheck(currency);
 
-        subProviders.get(currency).transfer(from, to, currency, amount, consumer);
+        subProviders.get(currency).transfer(from, to, currency, amount, reason, consumer);
     }
 
     @Override
-    public void setBalance(UUID uuid, Currency currency, BigDecimal amount, Consumer<TransactionResult> consumer) {
+    public void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
+                           Consumer<TransactionResult> consumer) {
         currencyCheck(currency);
 
-        subProviders.get(currency).setBalance(uuid, currency, amount, consumer);
+        subProviders.get(currency).setBalance(uuid, currency, amount, reason, consumer);
     }
 
     private void currencyCheck(Currency currency) {
