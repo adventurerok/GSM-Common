@@ -2,6 +2,8 @@ package com.ithinkrok.util.config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -124,6 +126,29 @@ public interface Config {
 
     default boolean isDouble(String path) {
         return get(path) instanceof Double;
+    }
+
+    default BigDecimal getBigDecimal(String path) {
+        return getBigDecimal(path, BigDecimal.ZERO);
+    }
+
+    default BigDecimal getBigDecimal(String path, BigDecimal def) {
+        Object obj = get(path);
+
+        if (obj instanceof Number) {
+            if(obj instanceof BigDecimal) {
+                return (BigDecimal) obj;
+            } else if(obj instanceof BigInteger) {
+                return new BigDecimal((BigInteger) obj);
+            } else {
+                return BigDecimal.valueOf(((Number) obj).doubleValue());
+            }
+        }
+        else return def;
+    }
+
+    default boolean isBigDecimal(String path) {
+        return get(path) instanceof BigDecimal;
     }
 
     default long getLong(String path) {
