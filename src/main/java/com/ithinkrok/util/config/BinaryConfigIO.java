@@ -3,6 +3,7 @@ package com.ithinkrok.util.config;
 import com.ithinkrok.msm.common.handler.PacketUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -87,6 +88,8 @@ public class BinaryConfigIO {
                 return msg.readBoolean();
             case BinaryConfigType.NULL:
                 return null;
+            case BinaryConfigType.BIG_DECIMAL:
+                return PacketUtils.readBigDecimal(msg);
             default:
                 if ((type & BinaryConfigType.LIST_MASK) == BinaryConfigType.LIST_MASK) {
                     return readList(msg, type);
@@ -241,6 +244,10 @@ public class BinaryConfigIO {
             if (writeType) out.writeByte(BinaryConfigType.VAR_LONG);
 
             PacketUtils.writeVarLong(obj.longValue(), out);
+        } else if (obj instanceof BigDecimal) {
+            if (writeType) out.writeByte(BinaryConfigType.BIG_DECIMAL);
+
+            PacketUtils.writeBigDecimal((BigDecimal) obj, out);
         }
     }
 
