@@ -123,7 +123,7 @@ public interface Config {
     }
 
     default boolean isDouble(String path) {
-        return get(path) instanceof Boolean;
+        return get(path) instanceof Double;
     }
 
     default long getLong(String path) {
