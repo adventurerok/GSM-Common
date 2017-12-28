@@ -1,6 +1,7 @@
 package com.ithinkrok.msm.common.economy;
 
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 
 import java.math.BigDecimal;
 
@@ -81,5 +82,18 @@ public abstract class AbstractCurrency implements Currency {
 
     public String getPluralFormat() {
         return pluralFormat;
+    }
+
+    public Config toConfig() {
+        Config result = new MemoryConfig();
+
+        result.set("singular", singularFormattedName);
+        result.set("plural", pluralFormattedName);
+        result.set("symbol", symbol);
+        result.set("singular_format", singularFormat);
+        result.set("plural_format", pluralFormat);
+        result.set("decimals", decimalPlaces);
+
+        return result;
     }
 }
