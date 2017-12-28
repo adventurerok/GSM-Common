@@ -1,6 +1,11 @@
 package com.ithinkrok.msm.common.economy.result;
 
+
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigDeserializer;
+import com.ithinkrok.util.config.ConfigSerializer;
+import com.ithinkrok.util.config.MemoryConfig;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -68,5 +73,28 @@ public final class BalanceChange {
 
     public String getReason() {
         return reason;
+    }
+
+    public Config toConfig(ConfigSerializer<Currency> currencySerializer) {
+        Config config = new MemoryConfig();
+
+        config.set("account", account.toString());
+        config.set("currency", currencySerializer.serialize(currency));
+        config.set("change", change);
+        config.set("new_balance", newBalance);
+        config.set("reason", reason);
+
+        return config;
+    }
+
+    public static BalanceChange fromConfig(Config config, ConfigDeserializer<Currency> currencyDeserializer) {
+
+        UUID account = UUID.fromString(config.getString("account"));
+        Currency currency = currencyDeserializer.deserialize(config.getConfigOrNull("currency"));
+        BigDecimal change = config.getBigDecimal("change");
+        BigDecimal newBalance = config.getBigDecimal("new_balance");
+        String reason = config.getString("reason");
+
+        return fromNewAndChange(account, currency, newBalance, change, reason);
     }
 }
