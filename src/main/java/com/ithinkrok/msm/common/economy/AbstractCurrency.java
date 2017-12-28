@@ -74,4 +74,12 @@ public abstract class AbstractCurrency implements Currency {
             return String.format(pluralFormat, amount);
         }
     }
+
+    public String getSingularFormat() {
+        return singularFormat;
+    }
+
+    public String getPluralFormat() {
+        return pluralFormat;
+    }
 }
