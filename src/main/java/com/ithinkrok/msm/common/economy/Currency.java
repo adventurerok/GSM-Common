@@ -24,7 +24,7 @@ public interface Currency {
     /**
      * @return The context for this currency. A (name,context) make up a unique currency.
      */
-    CurrencyContext getCurrencyContext();
+    EconomyContext getContext();
 
     /**
      * @return If it is valid to use this currency at this point.

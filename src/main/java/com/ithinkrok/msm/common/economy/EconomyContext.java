@@ -2,7 +2,7 @@ package com.ithinkrok.msm.common.economy;
 
 import java.util.Collection;
 
-public interface CurrencyContext {
+public interface EconomyContext {
 
     /**
      * @return The types of currency that may reside in this context
@@ -31,6 +31,9 @@ public interface CurrencyContext {
      *
      * @return The parent context to this one
      */
-    CurrencyContext getParent();
+    EconomyContext getParent();
+
+
+    void setParent(EconomyContext parent);
 
 }
