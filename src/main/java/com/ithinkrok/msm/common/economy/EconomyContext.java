@@ -1,13 +1,24 @@
 package com.ithinkrok.msm.common.economy;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public interface EconomyContext {
 
     /**
      * @return The types of currency that may reside in this context
      */
-    Collection<String> getCurrencyTypes();
+    default Collection<String> getCurrencyTypes() {
+        if(getParent() != null) {
+            Set<String> result = new HashSet<>(getParent().getCurrencyTypes());
+            result.add(getContextType());
+            return result;
+        } else {
+            return Collections.singleton(getContextType());
+        }
+    }
 
 
     /**
