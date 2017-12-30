@@ -85,8 +85,28 @@ public interface EconomyProvider {
      * @param reason
      * @param consumer Consumer to send the result to
      */
-    void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, String reason,
-                  Consumer<TransferResult> consumer);
+    default void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, String reason,
+                  Consumer<TransferResult> consumer) {
+        withdraw(from, currency, amount, reason, withRes -> {
+            if (withRes.getTransactionResult() == TransactionResult.SUCCESS) {
+                deposit(to, currency, amount, reason, depRes -> {
+
+                    TransferResult result = new TransferResult(depRes.getTransactionResult(),
+                                                               withRes.getBalanceChange(),
+                                                               depRes.getBalanceChange());
+                    consumer.accept(result);
+                });
+            } else {
+                getBalance(to, currency, balance -> {
+                    BalanceChange bc = BalanceChange.noBalanceChange(to, currency, balance.getAmount(), reason);
+                    TransferResult result = new TransferResult(withRes.getTransactionResult(),
+                                                               withRes.getBalanceChange(),
+                                                               bc);
+                    consumer.accept(result);
+                });
+            }
+        });
+    }
 
     /**
      * Sets the balance of the account for the given UUID and currency. Consumer code may be run on any thread.
