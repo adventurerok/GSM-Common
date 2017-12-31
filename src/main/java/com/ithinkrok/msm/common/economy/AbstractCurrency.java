@@ -9,12 +9,12 @@ import java.math.RoundingMode;
 public abstract class AbstractCurrency implements Currency {
 
     private final String name;
-    private final String singularFormattedName;
-    private final String pluralFormattedName;
-    private final String symbol;
-    private final String singularFormat;
-    private final String pluralFormat;
-    private final int decimalPlaces;
+    private String singularFormattedName;
+    private String pluralFormattedName;
+    private String symbol;
+    private String singularFormat;
+    private String pluralFormat;
+    private int decimalPlaces;
 
     public AbstractCurrency(String name, String singularFormattedName, String pluralFormattedName, String symbol,
                             String singularFormat, String pluralFormat, int decimalPlaces) {
@@ -30,6 +30,10 @@ public abstract class AbstractCurrency implements Currency {
     public AbstractCurrency(String name, Config config) {
         this.name = name;
 
+        reloadFromConfig(config);
+    }
+
+    protected void reloadFromConfig(Config config) {
         this.singularFormattedName = config.getString("singular");
         this.pluralFormattedName = config.getString("plural");
         this.symbol = config.getString("symbol", "$");
