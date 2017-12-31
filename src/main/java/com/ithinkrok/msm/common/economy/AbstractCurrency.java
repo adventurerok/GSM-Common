@@ -4,6 +4,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public abstract class AbstractCurrency implements Currency {
 
@@ -68,6 +69,8 @@ public abstract class AbstractCurrency implements Currency {
         if(amount == null) {
             throw new NullPointerException("amount cannot be null");
         }
+
+        amount = amount.setScale(decimalPlaces, RoundingMode.FLOOR);
 
         if(amount.compareTo(BigDecimal.ONE) == 0) {
             return String.format(singularFormat, amount);
