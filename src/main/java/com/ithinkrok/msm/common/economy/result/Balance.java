@@ -33,6 +33,10 @@ public class Balance {
         return amount;
     }
 
+    public int getAmountAsInt() {
+        return amount.intValue();
+    }
+
     public Config toConfig(ConfigSerializer<Currency> currencySerializer) {
         Config config = new MemoryConfig();
 
