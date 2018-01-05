@@ -1,6 +1,8 @@
 package com.ithinkrok.msm.common.economy;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 public interface Currency {
 
@@ -31,4 +33,8 @@ public interface Currency {
      *         Once this becomes false it should never become true again.
      */
     boolean isValid();
+
+    default MathContext getMathContext() {
+        return new MathContext(getDecimalPlaces(), RoundingMode.FLOOR);
+    }
 }
