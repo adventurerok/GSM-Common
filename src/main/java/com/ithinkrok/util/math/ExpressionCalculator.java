@@ -174,6 +174,12 @@ public class ExpressionCalculator implements Calculator {
      * @throws ExpressionException If there is a problem with the expression.
      */
     public ExpressionCalculator(String expression, SimplifyMode simplifyMode) {
+        //We are zero if null or empty
+        if(expression == null || expression.isEmpty()) {
+            this.expression = new NumberExpression(BigDecimal.ZERO);
+            return;
+        }
+
         List<String> tokens;
 
         try {
