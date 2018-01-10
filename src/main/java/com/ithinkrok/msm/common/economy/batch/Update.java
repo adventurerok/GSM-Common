@@ -4,19 +4,19 @@ import java.math.BigDecimal;
 
 public class Update {
 
-    private final Account account;
+    private final AccountIdentifier account;
     private final UpdateType updateType;
     private final BigDecimal amount;
 
 
-    public Update(Account account, UpdateType updateType, BigDecimal amount) {
+    public Update(AccountIdentifier account, UpdateType updateType, BigDecimal amount) {
         this.account = account;
         this.updateType = updateType;
         this.amount = amount;
     }
 
 
-    public Account getAccount() {
+    public AccountIdentifier getAccount() {
         return account;
     }
 
