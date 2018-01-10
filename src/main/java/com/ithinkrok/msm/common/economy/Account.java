@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common.economy;
 
+import com.ithinkrok.msm.common.economy.batch.Update;
+import com.ithinkrok.msm.common.economy.batch.UpdateType;
 import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
@@ -16,7 +18,11 @@ public interface Account {
     }
 
     default void hasBalance(Currency currency, Consumer<Boolean> consumer) {
-        getProvider().hasAccount(getUUID(), currency, consumer);
+        getProvider().hasAccount(identifier(currency), consumer);
+    }
+
+    default AccountIdentifier identifier(Currency currency) {
+        return new AccountIdentifier(getUUID(), currency);
     }
 
     /**
@@ -46,7 +52,7 @@ public interface Account {
     }
 
     default Optional<Boolean> hasBalance(Currency currency) {
-        return getProvider().hasAccount(getUUID(), currency);
+        return getProvider().hasAccount(identifier(currency));
     }
 
     default void getBalance(String currency, Consumer<Balance> consumer) {
@@ -54,7 +60,7 @@ public interface Account {
     }
 
     default void getBalance(Currency currency, Consumer<Balance> consumer) {
-        getProvider().getBalance(getUUID(), currency, consumer);
+        getProvider().getBalance(identifier(currency), consumer);
     }
 
     default Optional<Balance> getBalance(String currency) {
@@ -62,7 +68,7 @@ public interface Account {
     }
 
     default Optional<Balance> getBalance(Currency currency) {
-        return getProvider().getBalance(getUUID(), currency);
+        return getProvider().getBalance(identifier(currency));
     }
 
 
@@ -71,7 +77,10 @@ public interface Account {
     }
 
     default void deposit(Currency currency, BigDecimal amount, String reason, Consumer<BalanceUpdateResult> consumer) {
-        getProvider().deposit(getUUID(), currency, amount, reason, consumer);
+        Update update = new Update(identifier(currency), UpdateType.DEPOSIT, amount);
+        getProvider().executeUpdate(update, reason, updateResult -> {
+            consumer.accept(new BalanceUpdateResult(updateResult.getResult(), updateResult.getChange()));
+        });
     }
 
     default void withdraw(String currency, BigDecimal amount, String reason, Consumer<BalanceUpdateResult> consumer) {
@@ -79,7 +88,10 @@ public interface Account {
     }
 
     default void withdraw(Currency currency, BigDecimal amount, String reason, Consumer<BalanceUpdateResult> consumer) {
-        getProvider().withdraw(getUUID(), currency, amount, reason, consumer);
+        Update update = new Update(identifier(currency), UpdateType.WITHDRAW, amount);
+        getProvider().executeUpdate(update, reason, updateResult -> {
+            consumer.accept(new BalanceUpdateResult(updateResult.getResult(), updateResult.getChange()));
+        });
     }
 
     default void setBalance(String currency, BigDecimal amount, String reason,
@@ -89,7 +101,10 @@ public interface Account {
 
     default void setBalance(Currency currency, BigDecimal amount, String reason,
                             Consumer<BalanceUpdateResult> consumer) {
-        getProvider().setBalance(getUUID(), currency, amount, reason, consumer);
+        Update update = new Update(identifier(currency), UpdateType.SET, amount);
+        getProvider().executeUpdate(update, reason, updateResult -> {
+            consumer.accept(new BalanceUpdateResult(updateResult.getResult(), updateResult.getChange()));
+        });
     }
 
 }
