@@ -1,6 +1,7 @@
 package com.ithinkrok.msm.common.economy.result;
 
 
+import com.ithinkrok.msm.common.economy.AccountIdentifier;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigDeserializer;
@@ -12,52 +13,48 @@ import java.util.UUID;
 
 public final class BalanceChange {
 
-    private final UUID account;
-    private final Currency currency;
+    private final AccountIdentifier account;
     private final BigDecimal oldBalance;
     private final BigDecimal newBalance;
     private final BigDecimal change;
     private final String reason;
 
-    private BalanceChange(UUID account, Currency currency, BigDecimal oldBalance, BigDecimal newBalance,
+    private BalanceChange(AccountIdentifier account, BigDecimal oldBalance, BigDecimal newBalance,
                          BigDecimal change, String reason) {
         this.account = account;
-        this.currency = currency;
         this.oldBalance = oldBalance;
         this.newBalance = newBalance;
         this.change = change;
         this.reason = reason;
     }
 
-    public static BalanceChange fromOldAndNew(UUID account, Currency currency,
+    public static BalanceChange fromOldAndNew(AccountIdentifier account,
                                               BigDecimal oldBalance, BigDecimal newBalance,
                                               String reason) {
-        return new BalanceChange(account, currency, oldBalance, newBalance, newBalance.subtract(oldBalance), reason);
+        return new BalanceChange(account, oldBalance, newBalance, newBalance.subtract(oldBalance), reason);
     }
 
-    public static BalanceChange fromNewAndChange(UUID account, Currency currency,
+    public static BalanceChange fromNewAndChange(AccountIdentifier account,
                                               BigDecimal newBalance, BigDecimal change,
                                               String reason) {
-        return new BalanceChange(account, currency, newBalance.subtract(change), newBalance, change, reason);
+        return new BalanceChange(account, newBalance.subtract(change), newBalance, change, reason);
     }
 
-    public static BalanceChange fromOldAndChange(UUID account, Currency currency,
+    public static BalanceChange fromOldAndChange(AccountIdentifier account,
                                                  BigDecimal oldBalance, BigDecimal change,
                                                  String reason) {
-        return new BalanceChange(account, currency, oldBalance, oldBalance.add(change), change, reason);
+        return new BalanceChange(account, oldBalance, oldBalance.add(change), change, reason);
     }
 
-    public static BalanceChange noBalanceChange(UUID account, Currency currency, BigDecimal balance, String reason) {
-        return new BalanceChange(account, currency, balance, balance, BigDecimal.ZERO, reason);
+    public static BalanceChange noBalanceChange(AccountIdentifier account, BigDecimal balance, String reason) {
+        return new BalanceChange(account, balance, balance, BigDecimal.ZERO, reason);
     }
 
-    public UUID getAccount() {
+
+    public AccountIdentifier getAccount() {
         return account;
     }
 
-    public Currency getCurrency() {
-        return currency;
-    }
 
     public BigDecimal getOldBalance() {
         return oldBalance;
@@ -78,8 +75,8 @@ public final class BalanceChange {
     public Config toConfig(ConfigSerializer<Currency> currencySerializer) {
         Config config = new MemoryConfig();
 
-        config.set("account", account.toString());
-        config.set("currency", currencySerializer.serialize(currency));
+        config.set("account", account.getOwner().toString());
+        config.set("currency", currencySerializer.serialize(account.getCurrency()));
         config.set("change", change);
         config.set("new_balance", newBalance);
         config.set("reason", reason);
@@ -95,6 +92,6 @@ public final class BalanceChange {
         BigDecimal newBalance = config.getBigDecimal("new_balance");
         String reason = config.getString("reason");
 
-        return fromNewAndChange(account, currency, newBalance, change, reason);
+        return fromNewAndChange(new AccountIdentifier(account, currency), newBalance, change, reason);
     }
 }

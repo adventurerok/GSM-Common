@@ -1,6 +1,12 @@
 package com.ithinkrok.msm.common.economy.provider;
 
+import com.ithinkrok.msm.common.economy.AccountIdentifier;
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.Economy;
+import com.ithinkrok.msm.common.economy.batch.Batch;
+import com.ithinkrok.msm.common.economy.batch.BatchResult;
+import com.ithinkrok.msm.common.economy.batch.Update;
+import com.ithinkrok.msm.common.economy.batch.UpdateResult;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
@@ -22,28 +28,28 @@ public abstract class LookupEconomyProvider implements EconomyProvider {
 
 
     @Override
-    public boolean hasLocalAccount(UUID uuid, Currency currency) {
-        return lookupProviderForCurrency(currency).hasLocalAccount(uuid, currency);
+    public boolean hasLocalAccount(AccountIdentifier account) {
+        return lookupProviderForAccount(account).hasLocalAccount(account);
     }
 
     @Override
-    public void hasAccount(UUID uuid, Currency currency, Consumer<Boolean> consumer) {
-        lookupProviderForCurrency(currency).hasAccount(uuid, currency, consumer);
+    public void hasAccount(AccountIdentifier account, Consumer<Boolean> consumer) {
+        lookupProviderForAccount(account).hasAccount(account, consumer);
     }
 
     @Override
-    public Optional<Boolean> hasAccount(UUID uuid, Currency currency) {
-        return lookupProviderForCurrency(currency).hasAccount(uuid, currency);
+    public Optional<Boolean> hasAccount(AccountIdentifier account) {
+        return lookupProviderForAccount(account).hasAccount(account);
     }
 
     @Override
-    public void getBalance(UUID uuid, Currency currency, Consumer<Balance> consumer) {
-        lookupProviderForCurrency(currency).getBalance(uuid, currency, consumer);
+    public void getBalance(AccountIdentifier account, Consumer<Balance> consumer) {
+        lookupProviderForAccount(account).getBalance(account, consumer);
     }
 
     @Override
-    public Optional<Balance> getBalance(UUID uuid, Currency currency) {
-        return lookupProviderForCurrency(currency).getBalance(uuid, currency);
+    public Optional<Balance> getBalance(AccountIdentifier account) {
+        return lookupProviderForAccount(account).getBalance(account);
     }
 
     @Override
@@ -65,30 +71,51 @@ public abstract class LookupEconomyProvider implements EconomyProvider {
 
     }
 
-    @Override
-    public void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                        Consumer<BalanceUpdateResult> consumer) {
-        lookupProviderForCurrency(currency).deposit(uuid, currency, amount, reason, consumer);
-    }
 
     @Override
-    public void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                         Consumer<BalanceUpdateResult> consumer) {
-        lookupProviderForCurrency(currency).withdraw(uuid, currency, amount, reason, consumer);
+    public void executeUpdate(Update update, String reason, Consumer<UpdateResult> consumer) {
+        lookupProviderForAccount(update.getAccount()).executeUpdate(update, reason, consumer);
     }
 
-    @Override
-    public void transfer(UUID from, UUID to, Currency currency, BigDecimal amount,
-                         String reason,
-                         Consumer<TransferResult> consumer) {
-        lookupProviderForCurrency(currency).transfer(from, to, currency, amount, reason, consumer);
-    }
 
     @Override
-    public void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                           Consumer<BalanceUpdateResult> consumer) {
-        lookupProviderForCurrency(currency).setBalance(uuid, currency, amount, reason, consumer);
+    public void executeBatch(Batch batch, String reason, Consumer<BatchResult> consumer) {
+        if(batch.getUpdates().isEmpty()) {
+            consumer.accept(new BatchResult(Collections.emptyList(), true));
+        }
+
+        EconomyProvider provider = lookupProviderForAccount(batch.getUpdates().get(0).getAccount());
+
+        for (Update update : batch.getUpdates()) {
+            if(lookupProviderForAccount(update.getAccount()) != provider) {
+                throw new UnsupportedOperationException("We don't support batch updates across multiple providers yet");
+            }
+        }
+
+        provider.executeBatch(batch, reason, consumer);
+
+        //TODO support for cross provider batches
+//        Map<EconomyProvider, Batch> targets = new HashMap<>();
+//
+//        for (Update update : batch.getUpdates()) {
+//            EconomyProvider provider = lookupProviderForAccount(update.getAccount());
+//
+//            Batch forProvider = targets.computeIfAbsent(provider, economyProvider -> new Batch());
+//            forProvider.addUpdate(update);
+//        }
+//
+//        Consumer<BatchResult> aggregateConsumer = new AggregateBatchConsumer(consumer, targets.size());
+//
+//        for (Map.Entry<EconomyProvider, Batch> entry : targets.entrySet()) {
+//            entry.getKey().executeBatch(batch, reason, aggregateConsumer);
+//        }
     }
+
+
+    private EconomyProvider lookupProviderForAccount(AccountIdentifier account) {
+        return lookupProviderForCurrency(account.getCurrency());
+    }
+
 
     private static final class AggregateMultiBalanceConsumer implements Consumer<MultiBalanceResult> {
 
@@ -121,4 +148,27 @@ public abstract class LookupEconomyProvider implements EconomyProvider {
             }
         }
     }
+
+    // TODO implement support for cross provider Batches
+//    private class AggregateBatchConsumer implements Consumer<BatchResult> {
+//
+//        final Consumer<BatchResult> target;
+//        final int resultsExpected;
+//
+//        Collection<BatchResult> successfulResults = new ArrayList<>();
+//
+//        boolean failure;
+//        int resultsRecieved;
+//
+//        public AggregateBatchConsumer(Consumer<BatchResult> target, int resultsExpected) {
+//            this.target = target;
+//            this.resultsExpected = resultsExpected;
+//        }
+//
+//
+//        @Override
+//        public void accept(BatchResult batchResult) {
+//
+//        }
+//    }
 }

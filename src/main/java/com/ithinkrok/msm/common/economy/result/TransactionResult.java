@@ -11,6 +11,16 @@ public enum TransactionResult {
     /**
      * Indicates that the UUID used for the transaction did not have an account and one was not created
      */
-    NO_ACCOUNT
+    NO_ACCOUNT,
+
+    /**
+     * This update itself would have succeeded, but a later update in the batch failed.
+     */
+    ROLLED_BACK,
+
+    /**
+     * This update was not tried because an earlier update failed
+     */
+    BATCH_FAILED
 
 }

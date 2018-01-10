@@ -1,6 +1,11 @@
 package com.ithinkrok.msm.common.economy.provider;
 
+import com.ithinkrok.msm.common.economy.AccountIdentifier;
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.batch.Batch;
+import com.ithinkrok.msm.common.economy.batch.BatchResult;
+import com.ithinkrok.msm.common.economy.batch.Update;
+import com.ithinkrok.msm.common.economy.batch.UpdateResult;
 import com.ithinkrok.msm.common.economy.result.*;
 
 import java.math.BigDecimal;
@@ -27,10 +32,10 @@ public interface EconomyProvider {
      *
      * @return If the user has a local account for this currency
      */
-    boolean hasLocalAccount(UUID uuid, Currency currency);
+    boolean hasLocalAccount(AccountIdentifier account);
 
-    default void hasAccount(UUID uuid, Currency currency, Consumer<Boolean> consumer) {
-        consumer.accept(hasAccount(uuid, currency).get());
+    default void hasAccount(AccountIdentifier account, Consumer<Boolean> consumer) {
+        consumer.accept(hasAccount(account).get());
     }
 
     /**
@@ -39,10 +44,10 @@ public interface EconomyProvider {
      *
      * @return An Optional depicting whether the UUID specified has an account
      */
-    Optional<Boolean> hasAccount(UUID uuid, Currency currency);
+    Optional<Boolean> hasAccount(AccountIdentifier account);
 
-    default void getBalance(UUID uuid, Currency currency, Consumer<Balance> consumer) {
-        consumer.accept(getBalance(uuid, currency).get());
+    default void getBalance(AccountIdentifier account, Consumer<Balance> consumer) {
+        consumer.accept(getBalance(account).get());
     }
 
 
@@ -58,63 +63,24 @@ public interface EconomyProvider {
      * @return The balance of the specified UUID in the currency, 0 if they have none, or
      * {@link Optional#EMPTY} if this check would require blocking.
      */
-    Optional<Balance> getBalance(UUID uuid, Currency currency);
+    Optional<Balance> getBalance(AccountIdentifier account);
 
     /**
-     * Deposits the amount into the account of the given UUID and currency.
+     * Perform the specified update for the given reason, giving the result to the consumer
      */
-    void deposit(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                 Consumer<BalanceUpdateResult> consumer);
-
-    /**
-     * Withdraws amount from the account of the given UUID and currency.
-     *
-     * If insufficient funds are available in the account,
-     * the consumer will be called with {@link TransactionResult#NO_FUNDS}.
-     * There is no guarantee the account will have the required funds even after a call to getBalance.
-     */
-    void withdraw(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                  Consumer<BalanceUpdateResult> consumer);
-
-    /**
-     * Transfers money between from and to. This may run the consumer code on any thread that it wants.
-     *  @param from UUID to transfer money from
-     * @param to UUID to transfer money to
-     * @param currency Currency to transfer
-     * @param amount Amount to transfer
-     * @param reason
-     * @param consumer Consumer to send the result to
-     */
-    default void transfer(UUID from, UUID to, Currency currency, BigDecimal amount, String reason,
-                  Consumer<TransferResult> consumer) {
-        withdraw(from, currency, amount, reason, withRes -> {
-            if (withRes.getTransactionResult() == TransactionResult.SUCCESS) {
-                deposit(to, currency, amount, reason, depRes -> {
-
-                    TransferResult result = new TransferResult(depRes.getTransactionResult(),
-                                                               withRes.getBalanceChange(),
-                                                               depRes.getBalanceChange());
-                    consumer.accept(result);
-                });
-            } else {
-                getBalance(to, currency, balance -> {
-                    BalanceChange bc = BalanceChange.noBalanceChange(to, currency, balance.getAmount(), reason);
-                    TransferResult result = new TransferResult(withRes.getTransactionResult(),
-                                                               withRes.getBalanceChange(),
-                                                               bc);
-                    consumer.accept(result);
-                });
-            }
+    default void executeUpdate(Update update, String reason, Consumer<UpdateResult> consumer) {
+        executeBatch(new Batch(update), reason, batchResult -> {
+            consumer.accept(batchResult.getResults().get(0));
         });
     }
 
     /**
-     * Sets the balance of the account for the given UUID and currency. Consumer code may be run on any thread.
+     * Do all of the specified updates in the batch, giving the result to the consumer.
+     *
+     * Either all of the updates will succeed, or none of them will.
+     * (If one fails, we should rollback the others).
      */
-    void setBalance(UUID uuid, Currency currency, BigDecimal amount, String reason,
-                    Consumer<BalanceUpdateResult> consumer);
-
-
+    void executeBatch(Batch batch, String reason, Consumer<BatchResult> consumer);
 
     /**
      * @return A name for this economy provider
