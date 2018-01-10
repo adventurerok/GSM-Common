@@ -4,10 +4,7 @@ import com.ithinkrok.msm.common.economy.AccountIdentifier;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.CurrencyNotProvidedException;
 import com.ithinkrok.msm.common.economy.EconomyContext;
-import com.ithinkrok.msm.common.economy.batch.Batch;
-import com.ithinkrok.msm.common.economy.batch.BatchResult;
-import com.ithinkrok.msm.common.economy.batch.Update;
-import com.ithinkrok.msm.common.economy.batch.UpdateResult;
+import com.ithinkrok.msm.common.economy.batch.*;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceChange;
 import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
@@ -131,7 +128,7 @@ public class MemoryEconomyProvider implements EconomyProvider {
                     change = BalanceChange.fromOldAndChange(account, oldBalance, update.getAmount().negate(), reason);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unsupported UpdateType. Update ASAP");
+                    throw new UnsupportedOperationException("Unsupported UpdateType. Thus we fail");
             }
 
             results.add(new UpdateResult(update, TransactionResult.SUCCESS, change));
@@ -153,7 +150,8 @@ public class MemoryEconomyProvider implements EconomyProvider {
             TransactionResult transResult =
                     updateIndex < failIndex ? TransactionResult.ROLLED_BACK :
                             updateIndex > failIndex ? TransactionResult.BATCH_FAILED :
-                                    TransactionResult.NO_FUNDS;
+                                    isSupportedUpdate(update.getUpdateType()) ? TransactionResult.NO_FUNDS :
+                                            TransactionResult.UNSUPPORTED;
 
 
             results.add(new UpdateResult(update, transResult, change));
@@ -162,6 +160,19 @@ public class MemoryEconomyProvider implements EconomyProvider {
         }
 
         consumer.accept(new BatchResult(results, false));
+    }
+
+
+    private boolean isSupportedUpdate(UpdateType updateType) {
+        switch(updateType) {
+            case CHECK:
+            case SET:
+            case DEPOSIT:
+            case WITHDRAW:
+                return true;
+            default:
+                return false;
+        }
     }
 
 
@@ -182,6 +193,9 @@ public class MemoryEconomyProvider implements EconomyProvider {
                     }
 
                     break;
+                default:
+                    //We are unsupported
+                    return updateIndex;
             }
 
             ++updateIndex;
