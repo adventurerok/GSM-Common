@@ -21,6 +21,12 @@ public enum TransactionResult {
     /**
      * This update was not tried because an earlier update failed
      */
-    BATCH_FAILED
+    BATCH_FAILED,
+
+    /**
+     * This type of update is unsupported, or if this is in a batch,
+     * something about the batch (such as using multiple currencies across different providers) is unsupported.
+     */
+    UNSUPPORTED
 
 }
