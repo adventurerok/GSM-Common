@@ -1,6 +1,4 @@
-package com.ithinkrok.msm.common.economy.batch;
-
-import com.ithinkrok.msm.common.economy.Currency;
+package com.ithinkrok.msm.common.economy;
 
 import java.util.Objects;
 import java.util.UUID;

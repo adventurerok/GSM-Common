@@ -1,5 +1,7 @@
 package com.ithinkrok.msm.common.economy.batch;
 
+import com.ithinkrok.msm.common.economy.AccountIdentifier;
+
 import java.math.BigDecimal;
 
 public class Update {
