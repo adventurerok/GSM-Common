@@ -7,11 +7,8 @@ import com.ithinkrok.msm.common.economy.batch.BatchResult;
 import com.ithinkrok.msm.common.economy.batch.Update;
 import com.ithinkrok.msm.common.economy.batch.UpdateResult;
 import com.ithinkrok.msm.common.economy.result.Balance;
-import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
-import com.ithinkrok.msm.common.economy.result.TransferResult;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
