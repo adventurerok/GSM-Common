@@ -70,7 +70,11 @@ public interface EconomyProvider {
      */
     default void executeUpdate(Update update, String reason, Consumer<UpdateResult> consumer) {
         executeBatch(new Batch(update), reason, batchResult -> {
-            consumer.accept(batchResult.getResults().get(0));
+            if(!batchResult.getResults().isEmpty()) {
+                consumer.accept(batchResult.getResults().get(0));
+            } else {
+                consumer.accept(new UpdateResult(update, TransactionResult.FAILURE, null));
+            }
         });
     }
 

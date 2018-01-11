@@ -30,6 +30,10 @@ public class BatchResult {
     }
 
 
+    /**
+     *
+     * @return List of update results. If this is empty, we failed due to an error out of our control (e.g. SQL error)
+     */
     public List<UpdateResult> getResults() {
         return Collections.unmodifiableList(results);
     }
