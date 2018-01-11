@@ -1,9 +1,15 @@
 package com.ithinkrok.msm.common.economy.batch;
 
 import com.ithinkrok.msm.common.economy.AccountIdentifier;
+import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.result.BalanceChange;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigDeserializer;
+import com.ithinkrok.util.config.ConfigSerializer;
+import com.ithinkrok.util.config.MemoryConfig;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class Update {
 
@@ -50,5 +56,25 @@ public class Update {
             //nothing to do to rollback
             return null;
         }
+    }
+
+    public Config toConfig(ConfigSerializer<Currency> currencySerializer) {
+        Config config = new MemoryConfig();
+
+        config.set("account", account.getOwner().toString());
+        config.set("currency", currencySerializer.serialize(account.getCurrency()));
+        config.set("type", updateType.name());
+        config.set("amount", amount);
+
+        return config;
+    }
+
+    public static Update fromConfig(Config config, ConfigDeserializer<Currency> currencyDeserializer) {
+        UUID account = UUID.fromString(config.getString("account"));
+        Currency currency = currencyDeserializer.deserialize(config.getConfigOrNull("currency"));
+        UpdateType updateType = UpdateType.valueOf(config.getString("type"));
+        BigDecimal amount = config.getBigDecimal("amount");
+
+        return new Update(new AccountIdentifier(account, currency), updateType, amount);
     }
 }
