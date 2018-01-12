@@ -84,7 +84,7 @@ public class Batch implements Iterable<Update> {
 
     public static Batch fromConfig(Config config, ConfigDeserializer<Currency> currencyDeserializer) {
         List<Update> updates = config.getConfigList("updates").stream()
-                .map(updateConfig -> Update.fromConfig(config, currencyDeserializer))
+                .map(updateConfig -> Update.fromConfig(updateConfig, currencyDeserializer))
                 .collect(Collectors.toList());
 
         return new Batch(updates);
