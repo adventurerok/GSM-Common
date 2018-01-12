@@ -61,7 +61,7 @@ public class UpdateResult {
         BalanceChange change = null;
 
         if(config.contains("change")) {
-            change = BalanceChange.fromConfig(config, currencyDeserializer);
+            change = BalanceChange.fromConfig(config.getConfigOrNull("change"), currencyDeserializer);
         }
 
         return new UpdateResult(update, result, change);
