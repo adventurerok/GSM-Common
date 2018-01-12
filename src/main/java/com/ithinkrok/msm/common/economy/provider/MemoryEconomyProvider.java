@@ -94,6 +94,9 @@ public class MemoryEconomyProvider implements EconomyProvider {
         int failIndex = getFailIndex(batch);
 
 
+        //TODO this could actually lead to issues ,so fix it (e.g. DatabaseEconomyProvider implementation)
+        // (e.g. if you deposit and then withdraw it could fail when it should succeed or vice versa)
+
         if (failIndex >= 0) {
             resultsForFailedBatch(batch, reason, consumer, failIndex);
         } else {

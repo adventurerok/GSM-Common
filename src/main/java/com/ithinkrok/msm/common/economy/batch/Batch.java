@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * A batch of updates to be executed all at one atomically.
  */
-public class Batch {
+public class Batch implements Iterable<Update> {
 
     private final List<Update> updates = new ArrayList<>();
 
@@ -88,5 +88,11 @@ public class Batch {
                 .collect(Collectors.toList());
 
         return new Batch(updates);
+    }
+
+
+    @Override
+    public Iterator<Update> iterator() {
+        return updates.iterator();
     }
 }
