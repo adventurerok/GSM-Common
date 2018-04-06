@@ -1,9 +1,9 @@
 package com.ithinkrok.util.config;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +26,37 @@ public class JsonConfigIO {
         }
 
         return JSONValue.toJSONString(list);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Config loadConfig(String json) {
+        Object parsed = JSONValue.parse(json);
+        if(!(parsed instanceof Map)) {
+            throw new RuntimeException("json is not a JSONObject(Map): " + json);
+        }
+
+        return new MemoryConfig((Map<String, ?>) parsed);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Config> loadConfigs(String jsonArray) {
+        Object parsed = JSONValue.parse(jsonArray);
+        if(!(parsed instanceof List)) {
+            throw new RuntimeException("jsonArray is not a JSONArray(List): " + jsonArray);
+        }
+
+        JSONArray array = (JSONArray) parsed;
+        List<Config> result = new ArrayList<>();
+
+        for (Object jsonObject : array) {
+            if(!(jsonObject instanceof Map)) {
+                throw new RuntimeException("Not a list of JSONObjects(Maps): " + jsonArray);
+            }
+
+            result.add(new MemoryConfig((Map<String, ?>) jsonObject));
+        }
+
+        return result;
     }
 
 }
