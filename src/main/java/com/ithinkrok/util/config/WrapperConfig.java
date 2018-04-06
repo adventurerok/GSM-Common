@@ -15,7 +15,7 @@ public class WrapperConfig implements Config {
     public WrapperConfig(Config wrappedConfig) {
 
         //Ensure we do not have multiple nested WrapperConfigs
-        if(wrappedConfig instanceof WrapperConfig) {
+        if(wrappedConfig.getClass().equals(getClass())) {
             this.wrappedConfig = ((WrapperConfig) wrappedConfig).getWrappedConfig();
         } else {
             this.wrappedConfig = wrappedConfig;
