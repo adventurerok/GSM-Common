@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by paul on 04/01/16.
  */
-public class MapVariables implements Variables {
+public class MapVariables implements MutableVariables {
 
     private final Map<String, Number> variables;
 
@@ -48,6 +48,13 @@ public class MapVariables implements Variables {
 
         variables.put(name, value);
     }
+
+
+    @Override
+    public void setVariable(String name, BigDecimal value) {
+        setVariable(name, (Number) value);
+    }
+
 
     @Override
     public double getVariable(String name) {
