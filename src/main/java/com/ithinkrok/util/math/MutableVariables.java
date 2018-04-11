@@ -2,7 +2,7 @@ package com.ithinkrok.util.math;
 
 import java.math.BigDecimal;
 
-public interface MutableVariables extends Variables, Cloneable {
+public interface MutableVariables extends Variables {
 
     /**
      * Sets the value of the variable specified by name
@@ -23,6 +23,5 @@ public interface MutableVariables extends Variables, Cloneable {
         setVariable(name, value.doubleValue());
     }
 
-
-    MutableVariables clone();
+    MutableVariables copyVariables();
 }
