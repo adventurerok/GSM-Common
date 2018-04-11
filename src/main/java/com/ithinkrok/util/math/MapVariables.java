@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class MapVariables implements MutableVariables {
 
-    private final Map<String, Number> variables;
+    private Map<String, Number> variables;
 
     public MapVariables() {
         this(new HashMap<>());
@@ -53,6 +53,18 @@ public class MapVariables implements MutableVariables {
     @Override
     public void setVariable(String name, BigDecimal value) {
         setVariable(name, (Number) value);
+    }
+
+
+    @Override
+    public MutableVariables clone() {
+        try {
+            MapVariables clone = (MapVariables) super.clone();
+            clone.variables = new HashMap<>(variables);
+            return clone;
+        } catch (CloneNotSupportedException ignored) {
+            throw new RuntimeException("We do support clone");
+        }
     }
 
 
