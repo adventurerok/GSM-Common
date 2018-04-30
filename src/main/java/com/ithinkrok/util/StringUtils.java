@@ -14,6 +14,6 @@ public final class StringUtils {
     }
 
     public static String convertAmpersandToSelectionCharacter(String message) {
-        return message.replace('&', '§');
+        return message != null ? message.replace('&', '§') : null;
     }
 }
