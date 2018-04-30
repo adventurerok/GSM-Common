@@ -1,5 +1,6 @@
 package com.ithinkrok.msm.common.command;
 
+import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -24,8 +25,8 @@ public class CommandInfo implements ConfigSerializable {
     public CommandInfo(String name, Config config) {
         this.name = name;
         this.aliases = config.getStringList("aliases");
-        this.usage = config.getString("usage");
-        this.description = config.getString("description");
+        this.usage = StringUtils.convertAmpersandToSelectionCharacter(config.getString("usage"));
+        this.description = StringUtils.convertAmpersandToSelectionCharacter(config.getString("description"));
         this.permission = config.getString("permission");
 
         if(!config.contains("tab_complete")) return;
