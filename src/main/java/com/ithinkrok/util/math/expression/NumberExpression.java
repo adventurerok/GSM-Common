@@ -73,6 +73,6 @@ public class NumberExpression implements Expression {
 
     @Override
     public String toString() {
-        return decimalVal.toString();
+        return decimalVal != null ? decimalVal.toString() : Double.toString(doubleVal);
     }
 }
