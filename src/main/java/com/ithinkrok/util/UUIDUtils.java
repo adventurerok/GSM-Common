@@ -26,7 +26,11 @@ public final class UUIDUtils {
                         str.substring(16, 20) + "-" +
                         str.substring(20, 32);
 
-        return UUID.fromString(padded);
+        try {
+            return UUID.fromString(padded);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("Bad uuid input \'" + str + "\', causing IllegalArgumentException in UUID.fromString for uuid \'" + padded + "\'", e);
+        }
     }
 
 }
