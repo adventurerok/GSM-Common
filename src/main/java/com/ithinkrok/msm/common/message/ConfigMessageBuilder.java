@@ -110,27 +110,7 @@ public class ConfigMessageBuilder {
         return result;
     }
 
-    private static Map<Character, String> colorNames = new HashMap<>();
 
-    static {
-        colorNames.put('0', "black");
-        colorNames.put('1', "dark_blue");
-        colorNames.put('2', "dark_green");
-        colorNames.put('3', "dark_aqua");
-        colorNames.put('4', "dark_red");
-        colorNames.put('5', "dark_purple");
-        colorNames.put('6', "gold");
-        colorNames.put('7', "gray");
-        colorNames.put('8', "dark_gray");
-        colorNames.put('9', "blue");
-        colorNames.put('a', "green");
-        colorNames.put('b', "aqua");
-        colorNames.put('c', "red");
-        colorNames.put('d', "light_purple");
-        colorNames.put('e', "yellow");
-        colorNames.put('f', "white");
-        colorNames.put('r', "reset");
-    }
 
     private Config handleNonBracket(String text) {
         Config baseConfig = new MemoryConfig();
@@ -155,8 +135,9 @@ public class ConfigMessageBuilder {
                     current = new StringBuilder();
                 }
 
-                if(colorNames.containsKey(c)) {
-                    baseConfig.set("color", colorNames.get(c));
+                String colorName = ConfigMessageUtils.getColorCodeName(c);
+                if(colorName != null) {
+                    baseConfig.set("color", colorName);
                 } else switch(c) {
                     case 'l':
                         baseConfig.set("bold", !baseConfig.getBoolean("bold"));
