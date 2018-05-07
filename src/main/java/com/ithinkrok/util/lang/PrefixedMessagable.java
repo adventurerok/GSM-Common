@@ -5,7 +5,7 @@ import com.ithinkrok.util.config.Config;
 /**
  * Created by paul on 02/01/16.
  */
-public interface Messagable {
+public interface PrefixedMessagable {
 
     default void sendMessage(String message){
         sendMessageNoPrefix(getMessagePrefix() + message);
