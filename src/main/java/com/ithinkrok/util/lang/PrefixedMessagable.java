@@ -5,10 +5,15 @@ import com.ithinkrok.util.config.Config;
 /**
  * Created by paul on 02/01/16.
  */
-public interface PrefixedMessagable {
+public interface PrefixedMessagable extends Messagable {
 
+    @Override
     default void sendMessage(String message){
         sendMessageNoPrefix(getMessagePrefix() + message);
+    }
+
+    default void sendMessage(Config message) {
+        sendMessageNoPrefix(message);
     }
 
     void sendMessageNoPrefix(String message);
@@ -26,6 +31,7 @@ public interface PrefixedMessagable {
 
     String getMessagePrefix();
 
+    @Override
     default void sendLocale(String locale, Object... args){
         sendLocaleNoPrefix(locale, args);
     }
@@ -34,5 +40,4 @@ public interface PrefixedMessagable {
         sendMessageNoPrefix(getLanguageLookup().getLocale(locale, args));
     }
 
-    LanguageLookup getLanguageLookup();
 }
