@@ -1,5 +1,6 @@
 package com.ithinkrok.util.lang;
 
+import com.ithinkrok.msm.common.message.ConfigMessageUtils;
 import com.ithinkrok.util.config.Config;
 
 public interface Messagable {
@@ -7,7 +8,9 @@ public interface Messagable {
 
     void sendMessage(String message);
 
-    void sendMessage(Config message);
+    default void sendMessage(Config message) {
+        sendMessage(ConfigMessageUtils.messageToString(message));
+    }
 
     default void sendMessage(Object message){
         if(message instanceof Config) {

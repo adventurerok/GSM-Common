@@ -1,6 +1,8 @@
 package com.ithinkrok.util.lang;
 
+import com.ithinkrok.msm.common.message.ConfigMessageUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 
 /**
  * Created by paul on 02/01/16.
@@ -13,12 +15,17 @@ public interface PrefixedMessagable extends Messagable {
     }
 
     default void sendMessage(Config message) {
-        sendMessageNoPrefix(message);
+        Config prefix = ConfigMessageUtils.toConfigMessage(getMessagePrefix());
+        Config prefixAndMessage = new MemoryConfig(message);
+        ConfigMessageUtils.prependMessage(prefixAndMessage, prefix);
+        sendMessageNoPrefix(prefixAndMessage);
     }
 
     void sendMessageNoPrefix(String message);
 
-    void sendMessageNoPrefix(Config message);
+    default void sendMessageNoPrefix(Config message) {
+        sendMessageNoPrefix(ConfigMessageUtils.messageToString(message));
+    }
 
     default void sendMessageNoPrefix(Object message){
         if(message instanceof Config) {
