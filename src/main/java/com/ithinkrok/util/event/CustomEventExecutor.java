@@ -36,11 +36,7 @@ public class CustomEventExecutor {
             if (listener == null) continue;
             for (MethodExecutor methodExecutor : getMethodExecutors(listener, event)) {
 
-                Collection<CustomListener> group = map.get(methodExecutor);
-                if(group == null) {
-                    group = new ArrayList<>();
-                    map.put(methodExecutor, group);
-                }
+                Collection<CustomListener> group = map.computeIfAbsent(methodExecutor, k -> new ArrayList<>());
 
                 group.add(listener);
             }
@@ -84,11 +80,7 @@ public class CustomEventExecutor {
             if (listener == null) continue;
             for (MethodExecutor methodExecutor : getMethodExecutors(listener, event)) {
 
-                Collection<CustomListener> group = map.get(methodExecutor);
-                if(group == null) {
-                    group = new ArrayList<>();
-                    map.put(methodExecutor, group);
-                }
+                Collection<CustomListener> group = map.computeIfAbsent(methodExecutor, k -> new ArrayList<>());
 
                 group.add(listener);
             }
