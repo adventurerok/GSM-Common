@@ -248,7 +248,7 @@ public interface Config {
      * @param <T>    The type of the object
      * @return The (now modified) object
      */
-    default <T> T saveObjectFields(T object) {
+    default <T> T getAllFields(T object) {
         Field[] fields = object.getClass().getDeclaredFields();
 
         for (Field field : fields) {
@@ -290,6 +290,32 @@ public interface Config {
 
             } catch (IllegalAccessException e) {
                 //This should not happen hopefully.
+                e.printStackTrace();
+            }
+        }
+
+        return object;
+    }
+
+    /**
+     *  Loads the fields of the object into this config.
+     *
+     * @param object The object itself
+     * @param <T> The type of object
+     * @return The object, again
+     */
+    default <T> T setAllFields(T object) {
+        Field[] fields = object.getClass().getDeclaredFields();
+
+        for(Field field : fields) {
+            field.setAccessible(true);
+
+            if(Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) continue;
+
+            try {
+                set(field.getName(), field.get(object));
+            } catch (IllegalAccessException e) {
+                //hopefully we will be fine
                 e.printStackTrace();
             }
         }
