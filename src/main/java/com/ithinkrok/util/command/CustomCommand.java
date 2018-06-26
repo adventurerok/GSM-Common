@@ -90,6 +90,14 @@ public class CustomCommand {
         }
     }
 
+    public long getLongArg(int index, long def) {
+        try {
+            return Long.parseLong(defaultArgs.get(index));
+        } catch(Exception ignored) {
+            return def;
+        }
+    }
+
     public String getRemainingArgsAsString(int index) {
         StringBuilder result = new StringBuilder();
 
