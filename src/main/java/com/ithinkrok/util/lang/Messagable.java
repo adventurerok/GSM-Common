@@ -1,38 +1,27 @@
 package com.ithinkrok.util.lang;
 
+import com.ithinkrok.msm.common.message.ConfigMessageUtils;
 import com.ithinkrok.util.config.Config;
 
-/**
- * Created by paul on 02/01/16.
- */
 public interface Messagable {
 
-    default void sendMessage(String message){
-        sendMessageNoPrefix(getMessagePrefix() + message);
+
+    void sendMessage(String message);
+
+    default void sendMessage(Config message) {
+        sendMessage(ConfigMessageUtils.messageToString(message));
     }
 
-    void sendMessageNoPrefix(String message);
-
-    void sendMessageNoPrefix(Config message);
-
-    default void sendMessageNoPrefix(Object message){
+    default void sendMessage(Object message){
         if(message instanceof Config) {
-            sendMessageNoPrefix((Config)message);
+            sendMessage((Config)message);
         } else {
-            if(message == null) sendMessageNoPrefix((String)null);
-            else sendMessageNoPrefix(message.toString());
+            if(message == null) sendMessage((String)null);
+            else sendMessage(message.toString());
         }
     }
 
-    String getMessagePrefix();
-
-    default void sendLocale(String locale, Object... args){
-        sendLocaleNoPrefix(locale, args);
-    }
-
-    default void sendLocaleNoPrefix(String locale, Object... args){
-        sendMessageNoPrefix(getLanguageLookup().getLocale(locale, args));
-    }
+    void sendLocale(String locale, Object... args);
 
     LanguageLookup getLanguageLookup();
 }

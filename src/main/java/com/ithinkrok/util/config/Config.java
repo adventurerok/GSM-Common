@@ -12,19 +12,46 @@ import java.util.*;
  * Represents a config.
  * <p>
  * Configs should only store primitives, arrays/lists, strings and other configs.
+ * <p>
+ * It is possible to address values in subconfigs by including the address in the subconfig after the separator character.
+ * For instance, if we have a config at 'cfg' that contains an int 'anint', and the separator character is '.',
+ * we can address this as 'cfg.anint'. This can be used for configs at any depth.
  */
 public interface Config {
 
+    /**
+     * Converts the config into a Map
+     *
+     * @param deep If true, instead of putting Maps for subconfigs,
+     *             use the full path using the separator character to split
+     * @return This config as a Map
+     */
     Map<String, Object> getValues(boolean deep);
 
+    /**
+     * @param path The path to check
+     * @return If the config contains an item at path
+     */
     boolean contains(String path);
 
+    /**
+     * Load the values from the map into this config.
+     *
+     * @param values The map to load in.
+     */
     default void setAll(Map<String, Object> values) {
         for (String path : values.keySet()) {
             set(path, values.get(path));
         }
     }
 
+    /**
+     * Sets the value at path to value
+     *
+     * @param path  The path to put the value
+     * @param value The value
+     * @return The modified config object, to allow for chain calls
+     */
     Config set(String path, Object value);
 
     default void setAll(Config values) {
@@ -33,6 +60,10 @@ public interface Config {
         }
     }
 
+    /**
+     * @param deep Should full paths be returned for keys in subconfigs, separated by the separator character?
+     * @return The keys that have values in this config
+     */
     Set<String> getKeys(boolean deep);
 
     /**
@@ -45,14 +76,32 @@ public interface Config {
         return get(path, null);
     }
 
+    /**
+     * Gets the raw value this config contains at path, returning the placeholder def is nothing is found.
+     *
+     * @param path The path to get the value at
+     * @param def The placeholder if no value is found at path, e.g. {@code null}
+     * @return The raw object contained at path, or def if nothing is there.
+     */
     Object get(String path, Object def);
 
+    /**
+     * @return The separator character.
+     */
     char getSeparator();
 
+    /**
+     *
+     * @return toString() of the object at the path, or null if there is none
+     */
     default String getString(String path) {
         return getString(path, null);
     }
 
+    /**
+     *
+     * @return toString() of the object at the path, or def if there is none
+     */
     default String getString(String path, String def) {
         Object obj = get(path);
 
@@ -60,14 +109,25 @@ public interface Config {
         else return def;
     }
 
+    /**
+     *
+     * @return If there is a String stored at the given path
+     */
     default boolean isString(String path) {
         return get(path) instanceof String;
     }
 
+    /**
+     *
+     * @return The int value of the number stored at the path, or 0 if there is none
+     */
     default int getInt(String path) {
         return getInt(path, 0);
     }
 
+    /**
+     * @return The int value of the number stored at the path, or def if there is none
+     */
     default int getInt(String path, int def) {
         Object obj = get(path);
 
@@ -75,14 +135,25 @@ public interface Config {
         else return def;
     }
 
+    /**
+     *
+     * @return If the object at the path is an instance of Integer
+     */
     default boolean isInt(String path) {
         return get(path) instanceof Integer;
     }
 
+    /**
+     *
+     * @return The short value of the number stored at the path, or 0 if there is none
+     */
     default short getShort(String path) {
         return getShort(path, 0);
     }
 
+    /**
+     * @return The short value of the number stored at the path, or def if there is none
+     */
     default short getShort(String path, int def) {
         Object obj = get(path);
 
@@ -90,14 +161,25 @@ public interface Config {
         else return (short) def;
     }
 
+    /**
+     *
+     * @return If the object at the path is an instance of Short
+     */
     default boolean isShort(String path) {
         return get(path) instanceof Short;
     }
 
+    /**
+     *
+     * @return True if the boolean true is stored at path, otherwise false
+     */
     default boolean getBoolean(String path) {
         return getBoolean(path, false);
     }
 
+    /**
+     * @return The boolean value stored at path, or def is there is none
+     */
     default boolean getBoolean(String path, boolean def) {
         Object obj = get(path);
 
@@ -105,6 +187,9 @@ public interface Config {
         else return def;
     }
 
+    /**
+     * @return If there is a boolean stored at path
+     */
     default boolean isBoolean(String path) {
         return get(path) instanceof Boolean;
     }
@@ -136,15 +221,14 @@ public interface Config {
         Object obj = get(path);
 
         if (obj instanceof Number) {
-            if(obj instanceof BigDecimal) {
+            if (obj instanceof BigDecimal) {
                 return (BigDecimal) obj;
-            } else if(obj instanceof BigInteger) {
+            } else if (obj instanceof BigInteger) {
                 return new BigDecimal((BigInteger) obj);
             } else {
                 return BigDecimal.valueOf(((Number) obj).doubleValue());
             }
-        }
-        else return def;
+        } else return def;
     }
 
     default boolean isBigDecimal(String path) {
@@ -248,7 +332,7 @@ public interface Config {
      * @param <T>    The type of the object
      * @return The (now modified) object
      */
-    default <T> T saveObjectFields(T object) {
+    default <T> T getAllFields(T object) {
         Field[] fields = object.getClass().getDeclaredFields();
 
         for (Field field : fields) {
@@ -263,33 +347,59 @@ public interface Config {
                 if (field.getType().equals(double.class)) {
                     if (!isNumber(field.getName())) continue;
                     field.setDouble(object, getDouble(field.getName()));
-                } else if(field.getType().equals(float.class)) {
-                    if(!isNumber(field.getName())) continue;
+                } else if (field.getType().equals(float.class)) {
+                    if (!isNumber(field.getName())) continue;
                     field.setFloat(object, (float) getDouble(field.getName()));
-                } else if(field.getType().equals(int.class)) {
-                    if(!isNumber(field.getName())) continue;
+                } else if (field.getType().equals(int.class)) {
+                    if (!isNumber(field.getName())) continue;
                     field.setInt(object, getInt(field.getName()));
-                } else if(field.getType().equals(boolean.class)) {
-                    if(!isBoolean(field.getName())) continue;
+                } else if (field.getType().equals(boolean.class)) {
+                    if (!isBoolean(field.getName())) continue;
                     field.setBoolean(object, getBoolean(field.getName()));
-                } else if(field.getType().equals(long.class)) {
-                    if(!isNumber(field.getName())) continue;
+                } else if (field.getType().equals(long.class)) {
+                    if (!isNumber(field.getName())) continue;
                     field.setLong(object, getLong(field.getName()));
-                } else if(field.getType().equals(short.class)) {
-                    if(!isNumber(field.getName())) continue;
+                } else if (field.getType().equals(short.class)) {
+                    if (!isNumber(field.getName())) continue;
                     field.setShort(object, (short) getInt(field.getName()));
-                } else if(field.getType().equals(byte.class)) {
-                    if(!isNumber(field.getName())) continue;
+                } else if (field.getType().equals(byte.class)) {
+                    if (!isNumber(field.getName())) continue;
                     field.setByte(object, (byte) getInt(field.getName()));
                 } else {
                     Object newValue = getType(field.getName(), field.getType());
-                    if(newValue == null) continue;
+                    if (newValue == null) continue;
 
                     field.set(object, newValue);
                 }
 
             } catch (IllegalAccessException e) {
                 //This should not happen hopefully.
+                e.printStackTrace();
+            }
+        }
+
+        return object;
+    }
+
+    /**
+     * Loads the fields of the object into this config.
+     *
+     * @param object The object itself
+     * @param <T>    The type of object
+     * @return The object, again
+     */
+    default <T> T setAllFields(T object) {
+        Field[] fields = object.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) continue;
+
+            try {
+                set(field.getName(), field.get(object));
+            } catch (IllegalAccessException e) {
+                //hopefully we will be fine
                 e.printStackTrace();
             }
         }

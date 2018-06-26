@@ -21,12 +21,16 @@ public final class UUIDUtils {
         }
 
         String padded = str.substring(0, 8) + "-" +
-                        str.substring(4, 12) + "-" +
+                        str.substring(8, 12) + "-" +
                         str.substring(12, 16) + "-" +
                         str.substring(16, 20) + "-" +
                         str.substring(20, 32);
 
-        return UUID.fromString(padded);
+        try {
+            return UUID.fromString(padded);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("Bad uuid input \'" + str + "\', causing IllegalArgumentException in UUID.fromString for uuid \'" + padded + "\'", e);
+        }
     }
 
 }
