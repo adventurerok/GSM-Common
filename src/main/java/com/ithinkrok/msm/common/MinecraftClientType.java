@@ -7,5 +7,6 @@ public enum MinecraftClientType {
 
     CRAFTBUKKIT,
     SPIGOT,
-    BUNGEECORD
+    BUNGEECORD,
+    FORGE
 }
