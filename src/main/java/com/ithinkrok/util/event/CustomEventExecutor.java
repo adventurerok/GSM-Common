@@ -2,6 +2,7 @@ package com.ithinkrok.util.event;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by paul on 01/01/16.
@@ -9,6 +10,14 @@ import java.util.*;
 public class CustomEventExecutor {
 
     private static final Map<Class<? extends CustomListener>, ListenerHandler> listenerHandlerMap = new HashMap<>();
+
+    private static Consumer<EventException> exceptionHandler = null;
+
+
+    public static void setExceptionHandler(Consumer<EventException> exceptionHandler) {
+        CustomEventExecutor.exceptionHandler = exceptionHandler;
+    }
+
 
     public static void executeEvent(CustomEvent event, CustomListener... listeners) {
         executeListeners(event, getMethodExecutorMap(event, listeners));
@@ -20,8 +29,12 @@ public class CustomEventExecutor {
                 try {
                     entry.getKey().execute(listener, event);
                 } catch (EventException e) {
-                    System.out.println("Failed while calling event listener: " + listener.getClass());
-                    e.printStackTrace();
+                    if(exceptionHandler != null){
+                        exceptionHandler.accept(e);
+                    } else {
+                        System.out.println("Failed while calling event listener: " + listener.getClass());
+                        e.printStackTrace();
+                    }
                 }
             }
         }
