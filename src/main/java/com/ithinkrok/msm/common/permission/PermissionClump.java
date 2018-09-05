@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PermissionClump implements PermissionHolder {
 
 
-    private final List<ContextedPermission> basePermissions;
+    private List<ContextedPermission> basePermissions;
     private final PermissionLookup lookup;
 
 
@@ -19,6 +19,14 @@ public class PermissionClump implements PermissionHolder {
         this.basePermissions = basePermissions;
         this.lookup = lookup;
     }
+
+
+    public void setBasePermissions(List<ContextedPermission> basePermissions) {
+        this.basePermissions = basePermissions;
+
+        resolvedPermissions.clear();
+    }
+
 
     private final Map<PermissionContext, Map<String, Boolean>> resolvedPermissions = new ConcurrentHashMap<>();
 
