@@ -1,7 +1,5 @@
 package com.ithinkrok.msm.common.permission;
 
-import com.ithinkrok.msm.common.permission.PermissionContext;
-
 public class ContextedPermission {
 
     private final String permission;

@@ -1,6 +1,5 @@
 package com.ithinkrok.msm.common.permission;
 
-import com.ithinkrok.msm.common.permission.PermissionDefault;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.MemoryConfig;

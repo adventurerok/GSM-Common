@@ -1,6 +1,5 @@
 package com.ithinkrok.msm.common.permission;
 
-import com.ithinkrok.msm.common.permission.PermissionContext;
 import com.ithinkrok.util.config.Config;
 
 public interface PermissionHolder {
@@ -22,7 +21,7 @@ public interface PermissionHolder {
      *
      * @param permission The permission to check
      * @param context The context in which this permission is being checked.
-     * @return
+     * @return If the holder has this permission in the specified context.
      */
     boolean hasPermission(String permission, PermissionContext context);
 
