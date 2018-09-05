@@ -62,9 +62,17 @@ public class PermissionClump implements PermissionHolder {
 
     @Override
     public boolean hasPermission(String permission, PermissionContext context) {
-        return resolvedPermissions
-                .computeIfAbsent(context, this::resolvePermissions)
-                .getOrDefault(permission, false);
+        Map<String, Boolean> contextPermissions = resolvedPermissions
+                .computeIfAbsent(context, this::resolvePermissions);
+
+        if(contextPermissions.get(permission)) return true;
+
+        //allow wildcards for the last "directory" in the path, e.g. a.b.* counts for a.b.c, but not a.*
+        int lastDotIndex = permission.lastIndexOf('.');
+        if(lastDotIndex >= 0) {
+            String wildcard = permission.substring(0, lastDotIndex) + ".*";
+            return contextPermissions.get(wildcard);
+        } else return false;
     }
 
 
