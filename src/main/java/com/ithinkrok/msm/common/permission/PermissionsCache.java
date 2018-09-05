@@ -38,7 +38,7 @@ public class PermissionsCache {
         //prevent an infinite loop of parents
         if(!result.add(group)) return;
 
-        PermissionGroup groupDetails = groupLookup.getGroup(group);
+        Group groupDetails = groupLookup.getGroup(group);
         if(groupDetails != null) {
             for (String parent : groupDetails.getParents()) {
                 includeParents(parent, result);
@@ -66,7 +66,7 @@ public class PermissionsCache {
                 .map(groupLookup::getGroup)
                 .filter(Objects::nonNull)
                 .sorted()
-                .map(PermissionGroup::getPermissions)
+                .map(Group::getPermissions)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }

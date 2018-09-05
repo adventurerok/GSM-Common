@@ -5,7 +5,7 @@ import com.ithinkrok.util.config.Config;
 import java.util.List;
 import java.util.Set;
 
-public interface PermissionGroup extends Comparable<PermissionGroup> {
+public interface Group extends Comparable<Group> {
 
 
     /**
@@ -35,7 +35,7 @@ public interface PermissionGroup extends Comparable<PermissionGroup> {
     Config getPermittedConfig();
 
     @Override
-    default int compareTo(PermissionGroup o){
+    default int compareTo(Group o){
         if(o.getPriority() != this.getPriority()) {
             return Integer.compare(this.getPriority(), o.getPriority());
         } else return getName().compareTo(o.getName());
