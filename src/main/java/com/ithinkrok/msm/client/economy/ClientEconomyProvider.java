@@ -143,24 +143,6 @@ public class ClientEconomyProvider implements EconomyProvider {
     }
 
 
-    @SuppressWarnings("unchecked")
-    public void balanceUpdateResult(long ref, BalanceUpdateResult result) {
-        BalanceChange bc = result.getBalanceChange();
-        if (bc != null) {
-            updateCache(bc);
-        }
-
-        ConsumerHolder<BalanceUpdateResult> holder = (ConsumerHolder<BalanceUpdateResult>) consumers.remove(ref);
-
-        if (holder == null) {
-            //timed out
-            return;
-        }
-
-        holder.consumer.accept(result);
-    }
-
-
     private void updateCache(BalanceChange bc) {
         if (accountsInCache.contains(bc.getAccount().getOwner())) {
             cache.put(bc.getAccount(), bc.getNewBalance());
