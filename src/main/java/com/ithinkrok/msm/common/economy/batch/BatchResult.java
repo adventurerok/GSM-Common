@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 public class BatchResult {
 
+    public static BatchResult FAILURE = new BatchResult(Collections.emptyList(), false);
+
     private final boolean successful;
     private final List<UpdateResult> results;
 
