@@ -119,7 +119,7 @@ public abstract class LookupEconomyProvider implements EconomyProvider {
         //TODO it may be safer to execute local batches first, and only do global ones if local ones are successful
 
         for (Map.Entry<EconomyProvider, Batch> entry : targets.entrySet()) {
-            entry.getKey().executeBatch(batch, reason, batchResult -> {
+            entry.getKey().executeBatch(entry.getValue(), reason, batchResult -> {
                 aggregateConsumer.accept(entry.getKey(), batchResult);
             });
         }
