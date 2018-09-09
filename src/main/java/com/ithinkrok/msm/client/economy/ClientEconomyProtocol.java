@@ -13,6 +13,7 @@ import com.ithinkrok.msm.common.economy.batch.BatchResult;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceChange;
 import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
+import com.ithinkrok.util.Scheduler;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.JsonConfigIO;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -33,9 +34,9 @@ public class ClientEconomyProtocol implements ClientListener {
 
     private Channel channel;
 
-    public ClientEconomyProtocol() {
+    public ClientEconomyProtocol(Scheduler scheduler) {
         this.context = new GlobalContext();
-        this.provider = new ClientEconomyProvider(this, context);
+        this.provider = new ClientEconomyProvider(this, context, scheduler);
         this.economy = Economy.create(provider, context);
     }
 

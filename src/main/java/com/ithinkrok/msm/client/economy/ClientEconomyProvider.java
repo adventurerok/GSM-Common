@@ -8,19 +8,25 @@ import com.ithinkrok.msm.common.economy.batch.UpdateResult;
 import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.msm.common.economy.result.BalanceChange;
-import com.ithinkrok.msm.common.economy.result.BalanceUpdateResult;
 import com.ithinkrok.msm.common.economy.result.MultiBalanceResult;
+import com.ithinkrok.util.NullReplacements;
+import com.ithinkrok.util.Scheduler;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class ClientEconomyProvider implements EconomyProvider {
 
     private final Map<Long, ConsumerHolder<?>> consumers = new ConcurrentHashMap<>();
+
+    private static final int TIMEOUT_MILLIS = 5000;
 
 
     private final Map<AccountIdentifier, BigDecimal> cache = new ConcurrentHashMap<>();
@@ -32,9 +38,39 @@ public class ClientEconomyProvider implements EconomyProvider {
     private final AtomicLong nextRef = new AtomicLong(new Random().nextLong());
 
 
-    public ClientEconomyProvider(ClientEconomyProtocol protocol, GlobalContext context) {
+    public ClientEconomyProvider(ClientEconomyProtocol protocol, GlobalContext context, Scheduler scheduler) {
         this.protocol = protocol;
         this.context = context;
+
+        scheduler.scheduleRepeatAsync(this::detectTimeouts, 1, 1, TimeUnit.SECONDS);
+    }
+
+
+    private void detectTimeouts() {
+        Instant now = Instant.now();
+
+        Set<Long> timesToRemove = new HashSet<>();
+
+        consumers.replaceAll((time, consumerHolder) -> {
+           if(consumerHolder.time.until(now, ChronoUnit.MILLIS) > TIMEOUT_MILLIS) {
+               //use this generic method to avoid issues with ConsumerHolder<?>
+               timeoutConsumer(consumerHolder);
+
+               timesToRemove.add(time);
+
+               //replace with null consumer to be called with actual response if it comes in after timeout
+               return new ConsumerHolder<>(NullReplacements.nullConsumer(), null);
+           } else {
+               return consumerHolder;
+           }
+        });
+
+        consumers.keySet().removeAll(timesToRemove);
+    }
+
+
+    private <T> void timeoutConsumer(ConsumerHolder<T> consumerHolder) {
+        consumerHolder.consumer.accept(consumerHolder.timeoutResponse);
     }
 
 
@@ -72,7 +108,7 @@ public class ClientEconomyProvider implements EconomyProvider {
 
         if (!notLocal.isEmpty()) {
             long ref = nextRef.incrementAndGet();
-            consumers.put(ref, new ConsumerHolder<>(consumer));
+            consumers.put(ref, new ConsumerHolder<>(consumer, null));
 
             if (!protocol.sendGetBalances(ref, uuids, currencies)) {
                 //No result
@@ -203,7 +239,7 @@ public class ClientEconomyProvider implements EconomyProvider {
             consumer.accept(cache.containsKey(account));
         } else {
             long ref = nextRef.incrementAndGet();
-            consumers.put(ref, new ConsumerHolder<>(consumer));
+            consumers.put(ref, new ConsumerHolder<>(consumer, null));
 
             if (!protocol.sendHasAccount(ref, account.getOwner(), account.getCurrency())) {
                 //If no connection is available we return null straight away
@@ -240,7 +276,7 @@ public class ClientEconomyProvider implements EconomyProvider {
             consumer.accept(balance.get());
         } else {
             long ref = nextRef.incrementAndGet();
-            consumers.put(ref, new ConsumerHolder<>(consumer));
+            consumers.put(ref, new ConsumerHolder<>(consumer, null));
 
             if (!protocol.sendGetBalance(ref, account.getOwner(), account.getCurrency())) {
                 //No result
@@ -266,7 +302,7 @@ public class ClientEconomyProvider implements EconomyProvider {
     @Override
     public void executeBatch(Batch batch, String reason, Consumer<BatchResult> consumer) {
         long ref = nextRef.incrementAndGet();
-        consumers.put(ref, new ConsumerHolder<>(consumer));
+        consumers.put(ref, new ConsumerHolder<>(consumer, BatchResult.FAILURE));
 
         if(!protocol.sendBatch(ref, batch, reason)) {
             consumers.remove(ref);
@@ -279,10 +315,12 @@ public class ClientEconomyProvider implements EconomyProvider {
 
         private final Consumer<T> consumer;
         private final Instant time;
+        private final T timeoutResponse;
 
 
-        public ConsumerHolder(Consumer<T> consumer) {
+        public ConsumerHolder(Consumer<T> consumer, T timeoutResponse) {
             this.consumer = consumer;
+            this.timeoutResponse = timeoutResponse;
             this.time = Instant.now();
         }
     }
